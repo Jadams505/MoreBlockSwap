@@ -2,7 +2,7 @@ using Terraria.ModLoader;
 
 namespace MoreBlockSwap
 {
-	public class MoreBlockSwap : Mod
-	{
-	}
+    public class MoreBlockSwap : Mod
+    {
+    }
 }
