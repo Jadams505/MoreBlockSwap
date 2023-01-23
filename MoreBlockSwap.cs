@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -7,6 +8,29 @@ namespace MoreBlockSwap
 {
     public class MoreBlockSwap : Mod
     {
+        public HashSet<int> TilesThatWork = new HashSet<int>
+        {
+            TileID.Bottles,
+            TileID.Tables, // TileID.Tables2 also exists so need to use either Main.tileTable or TileID.Sets.CountsAsTable
+            TileID.Chairs,
+            TileID.Anvils, // Should also consider TileID.MythrilAnvil,
+            TileID.Furnaces, // Various forges
+            TileID.WorkBenches,
+            //TileID.Platforms, // Should use Vanilla
+            //TileID.Containers, // Shoud use Vanulla
+            TileID.Candles, // Weird behavior with lit vs unlit, Simliar tiles not considered: Platinum, Water, Peace Candles
+            TileID.Chandeliers, // Replacing always produces lit version, good enough for now
+            TileID.Count
+        };
+
+        public HashSet<int> TilesThatDontWork = new HashSet<int>
+        {
+            TileID.ClosedDoor, // Doors have multiple frames that interfere also open doors need to be handled specifically
+            TileID.Saplings, // Lets you replace always and consumes item probably need to do something with random place styles
+            TileID.Sunflower, // random styles
+            TileID.Count
+        };
+
         public override void Load()
         {
             On.Terraria.WorldGen.WouldTileReplacementWork += WorldGen_WouldTileReplacementWork;
@@ -27,20 +51,31 @@ namespace MoreBlockSwap
 
         private bool WorldGen_WouldTileReplacementWork(On.Terraria.WorldGen.orig_WouldTileReplacementWork orig, ushort attemptingToReplaceWith, int x, int y)
         {
+            bool vanillaCall = orig(attemptingToReplaceWith, x, y);
+            return vanillaCall || WouldMoreBlockSwapTileReplacementWork(attemptingToReplaceWith, x, y);
+        }
+
+        private static bool WouldMoreBlockSwapTileReplacementWork(ushort attemptingToReplaceWith, int x, int y)
+        {
             Tile tileToReplace = Framing.GetTileSafely(x, y);
-            if(tileToReplace.TileType == attemptingToReplaceWith && attemptingToReplaceWith < TileID.Count)
+            if (tileToReplace.TileType == attemptingToReplaceWith && attemptingToReplaceWith < TileID.Count)
             {
                 TileObjectData data = TileObjectData.GetTileData(tileToReplace);
-                if(data != null)
+                if (data != null)
                 {
                     return true;
                 }
             }
-            return orig(attemptingToReplaceWith, x, y);
+            return false;
         }
 
         private void WorldGen_MoveReplaceTileAnchor(On.Terraria.WorldGen.orig_MoveReplaceTileAnchor orig, ref int x, ref int y, ushort targetType, Tile t)
         {
+            if(ShouldVanillaHandleSwap(targetType, t))
+            {
+                orig(ref x, ref y, targetType, t);
+                return;
+            }
             TileObjectData data = TileObjectData.GetTileData(t);
             if(data != null)
             {
@@ -48,22 +83,24 @@ namespace MoreBlockSwap
                 int yAdjustment = t.TileFrameY % data.CoordinateFullHeight / (data.CoordinateHeights[0] + data.CoordinatePadding);
                 x -= xAdjustment;
                 y -= yAdjustment;
-                return;
             }
-            orig(ref x, ref y, targetType, t);
         }
 
         private void WorldGen_KillTile_GetItemDrops(On.Terraria.WorldGen.orig_KillTile_GetItemDrops orig, int x, int y, Tile tileCache, out int dropItem, out int dropItemStack, out int secondaryItem, out int secondaryItemStack, bool includeLargeObjectDrops)
         {
             orig(x, y, tileCache, out dropItem, out dropItemStack, out secondaryItem, out secondaryItemStack, includeLargeObjectDrops);
+            if(dropItem > 0)
+            {
+                return;
+            }
             if (includeLargeObjectDrops)
             {
                 TileObjectData data = TileObjectData.GetTileData(tileCache);
                 if (data != null)
                 {
-                    int style = TileObjectData.GetTileStyle(tileCache);
+                    int style = GetItemPlaceStyleFromTile(tileCache);
                     int drop = GetItemDrop(tileCache.TileType, style);
-                    if(drop != -1)
+                    if (drop != -1)
                     {
                         dropItem = drop;
                     }
@@ -73,6 +110,11 @@ namespace MoreBlockSwap
 
         private void WorldGen_ReplaceTIle_DoActualReplacement(On.Terraria.WorldGen.orig_ReplaceTIle_DoActualReplacement orig, ushort targetType, int targetStyle, int topLeftX, int topLeftY, Tile t)
         {
+            if (ShouldVanillaHandleSwap(targetType, t))
+            {
+                orig(targetType, targetStyle, topLeftX, topLeftY, t);
+                return;
+            }
             TileObjectData data = TileObjectData.GetTileData(t);
             if(data != null)
             {
@@ -123,10 +165,19 @@ namespace MoreBlockSwap
                     }
                 }
             }
-            else
-            {
-                orig(targetType, targetStyle, topLeftX, topLeftY, t);
-            }
+        }
+
+        private static bool ShouldVanillaHandleSwap(int targetType, Tile tileToReplace)
+        {
+            TileObjectData toReplaceData = TileObjectData.GetTileData(tileToReplace);
+            TileObjectData heldTileData = TileObjectData.GetTileData(targetType, 0);
+            int replaceType = tileToReplace.TileType;
+            return toReplaceData == null || heldTileData == null ||
+                TileID.Sets.BasicChest[targetType] || TileID.Sets.BasicChest[replaceType] ||
+                TileID.Sets.BasicDresser[targetType] || TileID.Sets.BasicDresser[replaceType] || 
+                targetType == TileID.Campfire || replaceType == TileID.Campfire ||
+                TileID.Sets.Platforms[targetType] || TileID.Sets.Platforms[replaceType] ||
+                TileID.Sets.Torch[targetType] || TileID.Sets.Torch[replaceType];
         }
 
         private bool Player_PlaceThing_ValidTileForReplacement(On.Terraria.Player.orig_PlaceThing_ValidTileForReplacement orig, Player self)
@@ -139,7 +190,8 @@ namespace MoreBlockSwap
             if (heldTile == tileToReplace.TileType && heldTile < TileID.Count)
             {
                 int tileToReplaceStyle = TileObjectData.GetTileStyle(tileToReplace);
-                return tileToReplaceStyle != -1 && placeStyle != tileToReplaceStyle;
+                int tileToReplaceItemPlaceStyle = GetItemPlaceStyleFromTile(tileToReplace);
+                return tileToReplaceStyle != -1 && placeStyle != tileToReplaceItemPlaceStyle;
             }
             return orig(self);
         }
@@ -156,6 +208,33 @@ namespace MoreBlockSwap
                 }
             }
             return -1;
+        }
+
+        public static int GetItemPlaceStyleFromTile(Tile tile)
+        {
+            TileObjectData data = TileObjectData.GetTileData(tile);
+            if(data == null)
+            {
+                return 0;
+            }
+
+            int tileObjectStyle = TileObjectData.GetTileStyle(tile);
+            int placementStyle = data.CalculatePlacementStyle(tileObjectStyle, 0, 0);
+            int calculatedStyle = placementStyle;
+
+            if(data.StyleMultiplier > 1)
+            {
+                return tileObjectStyle;
+            }
+
+            if(data.StyleWrapLimit > 0)
+            {
+                int startStyle = placementStyle / (data.StyleWrapLimit * data.StyleLineSkip) * data.StyleWrapLimit;
+                int styleOffset = placementStyle % data.StyleWrapLimit;
+
+                return startStyle + styleOffset;
+            }
+            return calculatedStyle;
         }
     }
 }
