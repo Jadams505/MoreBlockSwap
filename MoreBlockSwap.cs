@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Terraria;
 using Terraria.ID;
@@ -17,9 +18,30 @@ namespace MoreBlockSwap
             TileID.Furnaces, // Various forges
             TileID.WorkBenches,
             //TileID.Platforms, // Should use Vanilla
-            //TileID.Containers, // Shoud use Vanulla
-            TileID.Candles, // Weird behavior with lit vs unlit, Simliar tiles not considered: Platinum, Water, Peace Candles
+            //TileID.Containers, // Should use Vanulla
+            TileID.Candles, // Simliar tiles not considered: Platinum, Water, Peace Candles
             TileID.Chandeliers, // Replacing always produces lit version, good enough for now
+            TileID.Jackolanterns,
+            TileID.Presents,
+            TileID.HangingLanterns, // Same issues as candles,
+            TileID.WaterCandle, // Merge with candles
+            TileID.Books, // Test water bolt,
+            TileID.Hellforge, // Merge with furnace
+            TileID.ClayPot,
+            TileID.Beds, // Always replaces to same direction as placed tile,
+            TileID.Coral,
+            TileID.ImmatureHerbs, // Gives you back the seed, not vanilla but possibly better
+            TileID.Tombstones,
+            TileID.Loom,
+            TileID.Pianos,
+            //TileID.Dressers, // Vanilla
+            TileID.Benches,
+            TileID.Bathtubs, // Same as beds
+            TileID.Banners,
+            TileID.CookingPots,
+
+
+
             TileID.Count
         };
 
@@ -27,7 +49,9 @@ namespace MoreBlockSwap
         {
             TileID.ClosedDoor, // Doors have multiple frames that interfere also open doors need to be handled specifically
             TileID.Saplings, // Lets you replace always and consumes item probably need to do something with random place styles
-            TileID.Sunflower, // random styles
+            TileID.Signs, // Consumes item
+
+
             TileID.Count
         };
 
@@ -182,18 +206,33 @@ namespace MoreBlockSwap
 
         private bool Player_PlaceThing_ValidTileForReplacement(On.Terraria.Player.orig_PlaceThing_ValidTileForReplacement orig, Player self)
         {
-            int heldTile = self.HeldItem.createTile;
-            int placeStyle = self.HeldItem.placeStyle;
+            bool vanillaCall = orig(self);
+            return vanillaCall || IsTileValidForMoreBlockSwapReplacement(self);
+        }
+
+        private static bool IsTileValidForMoreBlockSwapReplacement(Player player)
+        {
+            int heldTile = player.HeldItem.createTile;
+            int placeStyle = player.HeldItem.placeStyle;
 
             Tile tileToReplace = Main.tile[Player.tileTargetX, Player.tileTargetY];
 
             if (heldTile == tileToReplace.TileType && heldTile < TileID.Count)
             {
-                int tileToReplaceStyle = TileObjectData.GetTileStyle(tileToReplace);
+                TileObjectData data = TileObjectData.GetTileData(tileToReplace);
+                if (data == null)
+                {
+                    return false;
+                }
+
                 int tileToReplaceItemPlaceStyle = GetItemPlaceStyleFromTile(tileToReplace);
-                return tileToReplaceStyle != -1 && placeStyle != tileToReplaceItemPlaceStyle;
+                if (data.RandomStyleRange > 0)
+                {
+                    return placeStyle == tileToReplaceItemPlaceStyle; // allows for replacement into a different random style
+                }
+                return placeStyle != tileToReplaceItemPlaceStyle;
             }
-            return orig(self);
+            return false;
         }
 
         public static int GetItemDrop(int targetTileId, int targetStyle)
@@ -222,19 +261,51 @@ namespace MoreBlockSwap
             int placementStyle = data.CalculatePlacementStyle(tileObjectStyle, 0, 0);
             int calculatedStyle = placementStyle;
 
+            if (data.RandomStyleRange > 0)
+            {
+                return placementStyle / data.RandomStyleRange; // normalize random style
+            }
+
             if(data.StyleMultiplier > 1)
             {
                 return tileObjectStyle;
             }
 
-            if(data.StyleWrapLimit > 0)
+            int swl = data.StyleWrapLimit;
+
+            if(swl > 0)
             {
-                int startStyle = placementStyle / (data.StyleWrapLimit * data.StyleLineSkip) * data.StyleWrapLimit;
-                int styleOffset = placementStyle % data.StyleWrapLimit;
+                int startStyle = placementStyle / (swl * data.StyleLineSkip) * swl;
+                int styleOffset = placementStyle % swl;
 
                 return startStyle + styleOffset;
             }
-            return calculatedStyle;
+
+            int col = tile.TileFrameX / data.CoordinateFullWidth;
+            int row = tile.TileFrameY / data.CoordinateFullHeight;
+
+            return data.StyleHorizontal ? col : row;
+            //return calculatedStyle;
+        }
+
+        public static int GetStyleFromTile(Tile getTile)
+        {
+            TileObjectData data = TileObjectData.GetTileData(getTile);
+            if (data == null)
+            {
+                return -1;
+            }
+
+            int col = getTile.TileFrameX / data.CoordinateFullWidth;
+            int row = getTile.TileFrameY / data.CoordinateFullHeight;
+            int swl = data.StyleWrapLimitVisualOverride ?? data.StyleWrapLimit;
+            if (swl == 0)
+            {
+                swl = 1;
+            }
+
+            int style = data.StyleHorizontal ? (row * swl + col) : (col * swl + row);
+            return style / data.StyleMultiplier;
         }
     }
 }
