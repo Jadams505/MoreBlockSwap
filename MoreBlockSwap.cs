@@ -9,50 +9,286 @@ namespace MoreBlockSwap
 {
     public class MoreBlockSwap : Mod
     {
-        public HashSet<int> TilesThatWork = new HashSet<int>
-        {
-            TileID.Bottles,
-            TileID.Tables, // TileID.Tables2 also exists so need to use either Main.tileTable or TileID.Sets.CountsAsTable
-            TileID.Chairs,
-            TileID.Anvils, // Should also consider TileID.MythrilAnvil,
-            TileID.Furnaces, // Various forges
-            TileID.WorkBenches,
-            //TileID.Platforms, // Should use Vanilla
-            //TileID.Containers, // Should use Vanulla
-            TileID.Candles, // Simliar tiles not considered: Platinum, Water, Peace Candles
-            TileID.Chandeliers, // Replacing always produces lit version, good enough for now
-            TileID.Jackolanterns,
-            TileID.Presents,
-            TileID.HangingLanterns, // Same issues as candles,
-            TileID.WaterCandle, // Merge with candles
-            TileID.Books, // Test water bolt,
-            TileID.Hellforge, // Merge with furnace
-            TileID.ClayPot,
-            TileID.Beds, // Always replaces to same direction as placed tile,
-            TileID.Coral,
-            TileID.ImmatureHerbs, // Gives you back the seed, not vanilla but possibly better
-            TileID.Tombstones,
-            TileID.Loom,
-            TileID.Pianos,
-            //TileID.Dressers, // Vanilla
-            TileID.Benches,
-            TileID.Bathtubs, // Same as beds
-            TileID.Banners,
-            TileID.CookingPots,
+        
+        //public HashSet<int> TilesThatWork = new HashSet<int>
+        //{
+        //    TileID.Bottles,
+        //    TileID.Tables, // TileID.Tables2 also exists so need to use either Main.tileTable or TileID.Sets.CountsAsTable
+        //    TileID.Chairs,
+        //    TileID.Anvils, // Should also consider TileID.MythrilAnvil,
+        //    TileID.Furnaces, // Various forges
+        //    TileID.WorkBenches,
+        //    //TileID.Platforms, // Should use Vanilla
+        //    //TileID.Containers, // Should use Vanulla
+        //    TileID.Candles, // Simliar tiles not considered: Platinum, Water, Peace Candles
+        //    TileID.Chandeliers, // Replacing always produces lit version, good enough for now
+        //    TileID.Jackolanterns,
+        //    TileID.Presents,
+        //    TileID.HangingLanterns, // Same issues as candles,
+        //    TileID.WaterCandle, // Merge with candles
+        //    TileID.Books, // Test water bolt,
+        //    TileID.Hellforge, // Merge with furnace
+        //    TileID.ClayPot,
+        //    TileID.Beds, // Always replaces to same direction as placed tile,
+        //    TileID.Coral,
+        //    TileID.ImmatureHerbs, // Gives you back the seed, not vanilla but possibly better
+        //    TileID.Tombstones,
+        //    TileID.Loom,
+        //    TileID.Pianos,
+        //    //TileID.Dressers, // Vanilla
+        //    TileID.Benches,
+        //    TileID.Bathtubs, // Same as beds
+        //    TileID.Banners,
+        //    TileID.CookingPots,
+        //    TileID.Candelabras, // Platinum version not included
+        //    TileID.Bookcases,
+        //    TileID.Thrones,
+        //    TileID.Bowls,
+        //    TileID.GrandfatherClocks,
+        //    TileID.Sawmill,
+        //    TileID.TinkerersWorkbench,
+        //    TileID.CrystalBall,
+        //    TileID.DiscoBall,
+        //    TileID.AdamantiteForge,
+        //    TileID.MythrilAnvil,
+        //    TileID.PressurePlates,
+        //    TileID.Switches, // Lets you replace with the side anchored version, fix later
+        //    TileID.Boulder,
+        //    TileID.MusicBoxes,
+        //    TileID.Explosives,
+        //    TileID.InletPump, // Should make pumps swap with each other
+        //    TileID.OutletPump,
+        //    TileID.Timers,
+        //    TileID.ChristmasTree,
+        //    TileID.Sinks,
+        //    TileID.PlatinumCandelabra,
+        //    TileID.PlatinumCandle,
+        //    TileID.WaterFountain,
+        //    TileID.LandMine,
+        //    TileID.SnowballLauncher,
+        //    TileID.Firework,
+        //    TileID.Blendomatic,
+        //    TileID.MeatGrinder,
+        //    TileID.Extractinator,
+        //    TileID.Solidifier,
+        //    TileID.DyePlants, // Swapping with bloodroot should be stopped
+        //    TileID.DyeVat,
+        //    TileID.Teleporter,
+        //    TileID.LihzahrdAltar,
+        //    TileID.MetalBars,
+        //    TileID.Painting3X3,
+        //    TileID.Painting4X3,
+        //    TileID.Painting6X4,
+        //    TileID.ImbuingStation,
+        //    TileID.Painting2X3,
+        //    TileID.Painting3X2,
+        //    TileID.Autohammer,
+        //    TileID.Pumpkins, // Same as immature herbs
+        //    TileID.FireflyinaBottle, // Should swap with other hanging bottles
+        //    TileID.LightningBuginaBottle,
+        //    TileID.BunnyCage, // Should swap with same sized cages
+        //    TileID.SquirrelCage,
+        //    TileID.MallardDuckCage,
+        //    TileID.DuckCage,
+        //    TileID.BirdCage,
+        //    TileID.BlueJay,
+        //    TileID.CardinalCage,
+        //    TileID.FishBowl,
+        //    TileID.HeavyWorkBench,
+        //    TileID.SnailCage,
+        //    TileID.GlowingSnailCage,
+        //    TileID.AmmoBox,
+        //    TileID.MonarchButterflyJar,
+        //    TileID.PurpleEmperorButterflyJar,
+        //    TileID.RedAdmiralButterflyJar,
+        //    TileID.UlyssesButterflyJar,
+        //    TileID.SulphurButterflyJar,
+        //    TileID.TreeNymphButterflyJar,
+        //    TileID.ZebraSwallowtailButterflyJar,
+        //    TileID.JuliaButterflyJar,
+        //    TileID.ScorpionCage,
+        //    TileID.BlackScorpionCage,
+        //    TileID.FrogCage,
+        //    TileID.MouseCage,
+        //    TileID.BoneWelder,
+        //    TileID.FleshCloningVat,
+        //    TileID.GlassKiln,
+        //    TileID.LihzahrdFurnace,
+        //    TileID.LivingLoom,
+        //    TileID.SkyMill,
+        //    TileID.IceMachine,
+        //    TileID.SteampunkBoiler,
+        //    TileID.HoneyDispenser,
+        //    TileID.PenguinCage,
+        //    TileID.WormCage,
+        //    TileID.BlueJellyfishBowl,
+        //    TileID.GreenJellyfishBowl,
+        //    TileID.PinkJellyfishBowl,
+        //    TileID.ShipInABottle,
+        //    TileID.SeaweedPlanter,
+        //    TileID.ShellPile, // Should swap amongst each other
+        //    TileID.FireworksBox,
+        //    TileID.AlphabetStatues, // Should swap with other statues
+        //    TileID.FireworkFountain,
+        //    TileID.GrasshopperCage,
+        //    TileID.BewitchingTable,
+        //    TileID.AlchemyTable,
+        //    TileID.Sundial, // 1.4.4 Moon dial
+        //    TileID.GoldBirdCage,
+        //    TileID.GoldBunnyCage,
+        //    TileID.GoldButterflyCage,
+        //    TileID.GoldFrogCage,
+        //    TileID.GoldGrasshopperCage,
+        //    TileID.GoldMouseCage,
+        //    TileID.GoldWormCage,
+        //    TileID.PeaceCandle,
+        //    TileID.FishingCrate,
+        //    TileID.SharpeningStation,
+        //    TileID.TargetDummy,
+        //    TileID.TrapdoorOpen,
+        //    TileID.TallGateOpen,
+        //    TileID.LavaLamp,
+        //    TileID.CageEnchantedNightcrawler,
+        //    TileID.CageBuggy,
+        //    TileID.CageGrubby,
+        //    TileID.CageSluggy,
+        //    TileID.LunarMonolith, // Other monoliths
+        //    TileID.Detonator,
+        //    TileID.LunarCraftingStation,
+        //    TileID.SquirrelOrangeCage,
+        //    TileID.SquirrelGoldCage,
+        //    TileID.LogicGateLamp,
+        //    TileID.LogicGate,
+        //    TileID.WeightedPressurePlate,
+        //    TileID.WireBulb,
+        //    TileID.FakeContainers, // FakeContainers2
+        //    TileID.ProjectilePressurePad,
+        //    TileID.BeeHive,
+        //    TileID.SillyBalloonMachine,
+        //    TileID.Pigronata,
+        //    TileID.PartyMonolith,
+        //    TileID.PartyBundleOfBalloonTile,
+        //    TileID.PartyPresent,
+        //    TileID.DjinnLamp, // Similar to bowls
+        //    TileID.DefendersForge,
+        //    TileID.WarTable,
+        //    TileID.WarTableBanner,
+        //    TileID.ElderCrystalStand,
+        //    //TileID.Containers2, // Vanilla
+        //    TileID.FakeContainers2, // Use TileID.Sets.BasicChestFake
+        //    TileID.Tables2,
+        //    TileID.BloodMoonMonolith, // Merge with other monoliths
+        //    TileID.RollingCactus, // Maybe merge with boulders
+        //    TileID.AntlionLarva,
+        //    TileID.DrumSet,
+        //    TileID.PicnicTable,
+        //    TileID.PinWheel,
+        //    TileID.WeatherVane,
+        //    TileID.VoidVault,
+        //    TileID.GolfCupFlag,
+        //    TileID.Toilets,
+        //    TileID.LesionStation,
+        //    TileID.GoldGoldfishBowl,
+        //    TileID.CatBast,
+        //    TileID.VoidMonolith, // Other monoliths
+        //    TileID.FoodPlatter, // Facing right gives item back
+        //    TileID.BlackDragonflyJar,
+        //    TileID.BlueDragonflyJar,
+        //    TileID.GreenDragonflyJar,
+        //    TileID.OrangeDragonflyJar,
+        //    TileID.RedDragonflyJar,
+        //    TileID.YellowDragonflyJar,
+        //    TileID.GoldDragonflyJar,
+        //    TileID.YellowDragonflyJar,
+        //    TileID.BoulderStatue, // could only be swapped with other statues if there was a roof
+        //    TileID.MaggotCage,
+        //    TileID.RatCage,
+        //    TileID.LadybugCage,
+        //    TileID.OwlCage,
+        //    TileID.PupfishBowl,
+        //    TileID.GoldLadybugCage,
+        //    TileID.LawnFlamingo, // swapping should not be possible but no items are lost
+        //    TileID.PottedPlants1,
+        //    TileID.PottedPlants2,
+        //    TileID.TurtleCage,
+        //    TileID.TurtleJungleCage,
+        //    TileID.GrebeCage,
+        //    TileID.SeagullCage,
+        //    TileID.WaterStriderCage,
+        //    TileID.GoldWaterStriderCage,
+        //    TileID.SeahorseCage,
+        //    TileID.GoldSeahorseCage,
+        //    TileID.GolfTrophies,
+        //    TileID.PlasmaLamp,
+        //    TileID.FogMachine,
+        //    TileID.GardenGnome,
+        //    TileID.PinkFairyJar,
+        //    TileID.GreenFairyJar,
+        //    TileID.BlueFairyJar,
+        //    TileID.SoulBottles,
+        //    TileID.RockGolemHead, // swapping should not be possible
+        //    TileID.HellButterflyJar,
+        //    TileID.LavaflyinaBottle,
+        //    TileID.MagmaSnailCage,
+        //    TileID.HangingLanterns,
+        //    TileID.BrazierSuspended, // merge with hanging lanterns
+        //    TileID.VolcanoSmall,
+        //    TileID.VolcanoLarge,
+        //    TileID.VanityTreeSakuraSaplings,
+        //    TileID.LavafishBowl,
+        //    TileID.AmethystBunnyCage,
+        //    TileID.TopazBunnyCage,
+        //    TileID.SapphireBunnyCage,
+        //    TileID.EmeraldBunnyCage,
+        //    TileID.RubyBunnyCage,
+        //    TileID.DiamondBunnyCage,
+        //    TileID.AmberBunnyCage,
+        //    TileID.AmethystSquirrelCage,
+        //    TileID.TopazSquirrelCage,
+        //    TileID.SapphireSquirrelCage,
+        //    TileID.EmeraldSquirrelCage,
+        //    TileID.RubySquirrelCage,
+        //    TileID.DiamondSquirrelCage,
+        //    TileID.AmberSquirrelCage,
+        //    TileID.PottedLavaPlants, // merge with PottedPlants1
+        //    TileID.PottedLavaPlantTendrils, // merge with PottedPlants2
+        //    TileID.VanityTreeWillowSaplings,
+        //    TileID.MasterTrophyBase,
+        //    TileID.TruffleWormCage,
+        //    TileID.EmpressButterflyJar,
+        //    TileID.SliceOfCake,
+        //    TileID.TeaKettle,
+        //    TileID.PottedCrystalPlants, // merge with PottedPlants1
+        //};
 
-
-
-            TileID.Count
-        };
-
-        public HashSet<int> TilesThatDontWork = new HashSet<int>
+        public static HashSet<int> TilesThatDontWork = new HashSet<int>
         {
             TileID.ClosedDoor, // Doors have multiple frames that interfere also open doors need to be handled specifically
             TileID.Saplings, // Lets you replace always and consumes item probably need to do something with random place styles
             TileID.Signs, // Consumes item
-
-
-            TileID.Count
+            TileID.Statues, // Facing right does not drop item
+            TileID.Lever, // Same as signs
+            TileID.Cannon, // Switching portal color causes no item to drop
+            TileID.Campfire, // Wait for 1.4.4
+            TileID.BubbleMachine, // Fails when toggled off
+            TileID.MushroomStatue, // Same as statues
+            TileID.ItemFrame, // Same as signs
+            TileID.Fireplace, // Same as bubble machine
+            TileID.Chimney, // Same as fire place
+            TileID.LogicSensor, // Since it is a tile entity it needs special handling when swapped
+            TileID.AnnouncementBox, // Same as signs
+            TileID.GemLocks, // Kills the gem inside
+            TileID.GeyserTrap, // Same as signs
+            TileID.SillyBalloonTile, // Same as signs
+            TileID.DisplayDoll, // Same as signs
+            TileID.WeaponsRack2, // Sames as signs
+            TileID.HatRack, // Same as signs
+            TileID.ArrowSign, // Sames as signs
+            TileID.PaintedArrowSign, // merge with arrow sign
+            TileID.Sandcastles, // Drops a sandcastle bucket instead of nothing/ even better sand
+            TileID.TatteredWoodSign, // Same as signs
+            TileID.GemSaplings, // Same as saplings
+            TileID.TeleportationPylon, // Needs checking for only one in the world, plus tile entity handling
         };
 
         public override void Load()
@@ -199,7 +435,7 @@ namespace MoreBlockSwap
             return toReplaceData == null || heldTileData == null ||
                 TileID.Sets.BasicChest[targetType] || TileID.Sets.BasicChest[replaceType] ||
                 TileID.Sets.BasicDresser[targetType] || TileID.Sets.BasicDresser[replaceType] || 
-                targetType == TileID.Campfire || replaceType == TileID.Campfire ||
+                /*targetType == TileID.Campfire || replaceType == TileID.Campfire ||*/
                 TileID.Sets.Platforms[targetType] || TileID.Sets.Platforms[replaceType] ||
                 TileID.Sets.Torch[targetType] || TileID.Sets.Torch[replaceType];
         }
@@ -219,6 +455,11 @@ namespace MoreBlockSwap
 
             if (heldTile == tileToReplace.TileType && heldTile < TileID.Count)
             {
+                if (TilesThatDontWork.Contains(heldTile))
+                {
+                    return false;
+                }
+
                 TileObjectData data = TileObjectData.GetTileData(tileToReplace);
                 if (data == null)
                 {
