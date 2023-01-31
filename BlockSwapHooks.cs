@@ -1,4 +1,5 @@
 ﻿using Terraria;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ObjectData;
 
@@ -146,6 +147,7 @@ namespace MoreBlockSwap
                         Tile tile = Framing.GetTileSafely(topLeftX + i, topLeftY + j);
                         tile.TileFrameX += (short)deltaX;
                         tile.TileFrameY += (short)deltaY;
+                        tile.Clear(TileDataType.TilePaint);
                     }
                 }
 
