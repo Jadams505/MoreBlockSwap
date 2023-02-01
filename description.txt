@@ -1,1 +1,13 @@
-Block Swap Plus is a pretty cool mod, it does...this. Modify this file with a description of your mod.
+Allows for more tiles to be block swapped with each other
+
+Examples:
+- Bookcases
+- Beds
+- Banners
+- Paintings
+- Clocks
+- Tombstones
+- Relics
+- And Many More
+
+Currently only works with vanilla tiles.

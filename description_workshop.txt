@@ -1,0 +1,17 @@
+﻿Allows for more tiles to be block swapped with each other
+
+[h1]Examples[/h1]
+[list]
+[*]Bookcases
+[*]Beds
+[*]Banners
+[*]Paintings
+[*]Clocks
+[*]Tombstones
+[*]Relics
+[*]And Many More
+[/list]
+
+Currently only works with vanilla tiles.
+
+Github: https://github.com/Jadams505/MoreBlockSwap
