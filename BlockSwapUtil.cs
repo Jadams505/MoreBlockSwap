@@ -1,5 +1,6 @@
 ﻿using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
 using Terraria.ObjectData;
 
 namespace MoreBlockSwap
@@ -14,10 +15,9 @@ namespace MoreBlockSwap
                 return 0;
             }
 
-            int manualStyle = GetCustomPlaceStyle(tile);
-            if (manualStyle != -1)
+            if(GetPlaceStyleForDoor(tile, out int style))
             {
-                return manualStyle;
+                return style;
             }
 
             int tileObjectStyle = TileObjectData.GetTileStyle(tile);
@@ -49,14 +49,28 @@ namespace MoreBlockSwap
             return data.StyleHorizontal ? col : row;
         }
 
-        public static int GetCustomPlaceStyle(Tile tile)
+        public static bool GetPlaceStyleForDoor(Tile tile, out int style)
         {
-            switch (tile.TileType)
+            TileObjectData data = TileObjectData.GetTileData(tile);
+            ModTile mTile = TileLoader.GetTile(tile.TileType);
+
+            if ((mTile != null && mTile.OpenDoorID != -1) || tile.TileType == TileID.ClosedDoor)
             {
-                case TileID.ClosedDoor:
-                    break;
+                int row = tile.TileFrameY / data.CoordinateFullHeight;
+                int col = tile.TileFrameX / (data.CoordinateFullWidth * 3);
+
+                style =  row + col * data.StyleWrapLimit;
+                return true;
             }
-            return -1;
+            else if ((mTile != null && mTile.CloseDoorID != -1) || tile.TileType == TileID.OpenDoor)
+            {
+                int row = tile.TileFrameY / data.CoordinateFullHeight;
+                int col = tile.TileFrameX / (data.CoordinateFullWidth * 2);
+                style =  row + col * 36;
+                return true;
+            }
+            style = 0;
+            return false;
         }
 
         public static int GetItemDrop(int targetTileId, int targetStyle)

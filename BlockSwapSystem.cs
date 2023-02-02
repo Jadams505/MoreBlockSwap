@@ -10,7 +10,6 @@ namespace MoreBlockSwap
 
         public HashSet<int> TilesThatDontWork = new HashSet<int>
         {
-            TileID.ClosedDoor, // Doors have multiple frames that interfere also open doors need to be handled specifically
             TileID.Saplings, // Lets you replace always and consumes item probably need to do something with random place styles
             TileID.Signs, // Consumes item
             TileID.Statues, // Facing right does not drop item
