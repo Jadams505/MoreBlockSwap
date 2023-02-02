@@ -22,10 +22,12 @@ namespace MoreBlockSwap
 
             if (heldTile == tileToReplace.TileType && heldTile < TileID.Count)
             {
+                /*
                 if (BlockSwapSystem.Instance.TilesThatDontWork.Contains(heldTile))
                 {
                     return false;
                 }
+                */
 
                 TileObjectData data = TileObjectData.GetTileData(tileToReplace);
                 if (data == null)
@@ -136,19 +138,19 @@ namespace MoreBlockSwap
                     newTopLeftY = data.CoordinateFullHeight * style;
                 }
 
-                Tile topLeftTile = Framing.GetTileSafely(topLeftX, topLeftY);
-                int deltaX = newTopLeftX - topLeftTile.TileFrameX;
-                int deltaY = newTopLeftY - topLeftTile.TileFrameY;
-
+                int newFrameX = newTopLeftX;
                 for (int i = 0; i < data.Width; ++i)
                 {
+                    int newFrameY = newTopLeftY;
                     for (int j = 0; j < data.Height; ++j)
                     {
                         Tile tile = Framing.GetTileSafely(topLeftX + i, topLeftY + j);
-                        tile.TileFrameX += (short)deltaX;
-                        tile.TileFrameY += (short)deltaY;
+                        tile.TileFrameX = (short)newFrameX;
+                        tile.TileFrameY = (short)newFrameY;
                         tile.Clear(TileDataType.TilePaint);
+                        newFrameY += data.CoordinateHeights[j] + data.CoordinatePadding;
                     }
+                    newFrameX += data.CoordinateWidth + data.CoordinatePadding;
                 }
 
                 for (int i = 0; i < data.Width; ++i)

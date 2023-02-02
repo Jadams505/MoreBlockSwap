@@ -14,6 +14,12 @@ namespace MoreBlockSwap
                 return 0;
             }
 
+            int manualStyle = GetCustomPlaceStyle(tile);
+            if (manualStyle != -1)
+            {
+                return manualStyle;
+            }
+
             int tileObjectStyle = TileObjectData.GetTileStyle(tile);
             int placementStyle = data.CalculatePlacementStyle(tileObjectStyle, 0, 0);
 
@@ -41,6 +47,16 @@ namespace MoreBlockSwap
             int row = tile.TileFrameY / data.CoordinateFullHeight;
 
             return data.StyleHorizontal ? col : row;
+        }
+
+        public static int GetCustomPlaceStyle(Tile tile)
+        {
+            switch (tile.TileType)
+            {
+                case TileID.ClosedDoor:
+                    break;
+            }
+            return -1;
         }
 
         public static int GetItemDrop(int targetTileId, int targetStyle)
