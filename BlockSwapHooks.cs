@@ -37,6 +37,11 @@ namespace MoreBlockSwap
                 return false;
             }
 
+            if(tileToReplace.TileType == TileID.GemLocks && tileToReplace.TileFrameY >= 54)
+            {
+                return false; // prevents swappping gem locks when full to prevent networking issues
+            }
+
             if (IsValidForReplacementCustom(heldTile, placeStyle, tileToReplace))
             {
                 return true;
@@ -80,6 +85,11 @@ namespace MoreBlockSwap
             }
 
             if(heldTileId == TileID.Saplings && tileToReplace.TileType == TileID.Saplings)
+            {
+                return true;
+            }
+
+            if(heldTileId == TileID.GemSaplings && tileToReplace.TileType == TileID.GemSaplings)
             {
                 return true;
             }

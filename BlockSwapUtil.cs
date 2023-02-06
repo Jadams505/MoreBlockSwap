@@ -98,6 +98,8 @@ namespace MoreBlockSwap
                 TileID.Saplings => 0, // makes all saplings drop acorns
                 TileID.Statues => calculatedStyle % 165,
                 TileID.Cannon => Math.Clamp(tile.TileFrameX / data.CoordinateFullWidth, 0, 3),
+                TileID.SillyBalloonTile => tile.TileFrameX / (data.CoordinateFullWidth * 2) * 2, // Purple = 0, Green = 2, Pink = 4
+                TileID.Campfire => tile.TileFrameX / data.CoordinateFullWidth, // Remove with 1.4.4
 
                 TileID.GeyserTrap => 0,
                 TileID.BubbleMachine => 0,
@@ -118,6 +120,12 @@ namespace MoreBlockSwap
 
         public static int GetItemDrop(int targetTileId, int targetStyle)
         {
+            int customDrop = GetCustomDrop(targetTileId, targetStyle);
+            if(customDrop != -1)
+            {
+                return customDrop;
+            }
+
             for (int i = 0; i < ItemID.Count; ++i)
             {
                 Item item = new Item();
@@ -126,6 +134,16 @@ namespace MoreBlockSwap
                 {
                     return i;
                 }
+            }
+            return -1;
+        }
+
+        public static int GetCustomDrop(int targetTileId, int targetStyle)
+        {
+            switch (targetTileId)
+            {
+                case TileID.Sandcastles:
+                    return ItemID.SandBlock;
             }
             return -1;
         }
