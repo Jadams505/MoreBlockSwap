@@ -247,3 +247,4 @@ TileID.EmpressButterflyJar,
 TileID.SliceOfCake,
 TileID.TeaKettle,
 TileID.PottedCrystalPlants, // merge with PottedPlants1
+TileID.PaintedArrowSign, // merge with arrow sign

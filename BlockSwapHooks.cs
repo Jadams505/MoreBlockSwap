@@ -24,8 +24,20 @@ namespace MoreBlockSwap
         private static bool IsTileValidForMoreBlockSwapReplacement(int heldTile, int placeStyle, int targetX, int targetY)
         {
             Tile tileToReplace = Main.tile[targetX, targetY];
+            TileObjectData data = TileObjectData.GetTileData(tileToReplace);
 
-            if(IsValidForReplacementCustom(heldTile, placeStyle, tileToReplace))
+            if (data == null)
+            {
+                return false;
+            }
+
+            Point16 potentialTileEntityPos = BlockSwapUtil.TileEntityCoordinates(targetX, targetY, data.CoordinateWidth + data.CoordinatePadding, data.Width, data.Height);
+            if(TileEntity.ByPosition.TryGetValue(potentialTileEntityPos, out _))
+            {
+                return false;
+            }
+
+            if (IsValidForReplacementCustom(heldTile, placeStyle, tileToReplace))
             {
                 return true;
             }
@@ -39,12 +51,6 @@ namespace MoreBlockSwap
                 }
                 */
 
-                TileObjectData data = TileObjectData.GetTileData(tileToReplace);
-                if (data == null)
-                {
-                    return false;
-                }
-
                 int tileToReplaceItemPlaceStyle = BlockSwapUtil.GetItemPlaceStyleFromTile(tileToReplace);
                 if (data.RandomStyleRange > 0)
                 {
@@ -57,20 +63,27 @@ namespace MoreBlockSwap
 
         private static bool IsValidForReplacementCustom(int heldTileId, int heldPlaceStyle, Tile tileToReplace)
         {
-            int tileToReplaceStyle = BlockSwapUtil.GetItemPlaceStyleFromTile(tileToReplace);
+            int tileToReplacePlaceStyle = BlockSwapUtil.GetItemPlaceStyleFromTile(tileToReplace);
+            TileObjectData tileToReplaceData = TileObjectData.GetTileData(tileToReplace);
+            int tileToReplaceRealStyle = TileObjectData.GetTileStyle(tileToReplace);
             int closeDoorId = TileLoader.CloseDoorID(tileToReplace);
+
             if (closeDoorId != -1)
             {
                 if(heldTileId == closeDoorId)
                 {
-                    int style = -1, alternate = -1;
-                    TileObjectData.GetTileInfo(tileToReplace, ref style, ref alternate);
-                    if (tileToReplaceStyle != -1)
+                    if (tileToReplacePlaceStyle != -1)
                     {
-                        return heldPlaceStyle != tileToReplaceStyle;
+                        return heldPlaceStyle != tileToReplacePlaceStyle;
                     }
                 }
             }
+
+            if(heldTileId == TileID.Saplings && tileToReplace.TileType == TileID.Saplings)
+            {
+                return true;
+            }
+
             return false;
         }
 
