@@ -1,3 +1,2 @@
 ﻿
-Added more tiles that can be swapped: Doors, Gem Saplings, Statues, and more
-Prevented swapping with tiles that contain tile entities
+Fixed potential divide by zero errors
