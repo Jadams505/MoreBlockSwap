@@ -107,8 +107,11 @@ namespace MoreBlockSwap
             TileObjectData data = TileObjectData.GetTileData(t);
             if (data != null)
             {
-                int xAdjustment = t.TileFrameX % data.CoordinateFullWidth / (data.CoordinateWidth + data.CoordinatePadding);
-                int yAdjustment = t.TileFrameY % data.CoordinateFullHeight / (data.CoordinateHeights[0] + data.CoordinatePadding);
+                int frameX = t.TileFrameX;
+                int frameY = t.TileFrameY;
+
+                int xAdjustment = frameX.SafeMod(data.CoordinateFullWidth).SafeDivide(data.CoordinateWidth + data.CoordinatePadding);
+                int yAdjustment = frameY.SafeMod(data.CoordinateFullHeight).SafeDivide(data.CoordinateHeights[0] + data.CoordinatePadding);
                 x -= xAdjustment;
                 y -= yAdjustment;
             }
@@ -199,7 +202,7 @@ namespace MoreBlockSwap
 
                 if (data.StyleWrapLimit > 0)
                 {
-                    adjustedStyle = style / data.StyleWrapLimit * data.StyleLineSkip;
+                    adjustedStyle = style.SafeDivide(data.StyleWrapLimit) * data.StyleLineSkip;
                     style %= data.StyleWrapLimit;
                 }
 

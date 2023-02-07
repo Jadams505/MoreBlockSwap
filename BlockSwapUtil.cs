@@ -45,14 +45,16 @@ namespace MoreBlockSwap
 
             if (swl > 0)
             {
-                int startStyle = placementStyle / (swl * data.StyleLineSkip) * swl;
+                int startStyle = swl * placementStyle.SafeDivide(swl * data.StyleLineSkip);
                 int styleOffset = placementStyle % swl;
 
                 return startStyle + styleOffset;
             }
 
-            int col = tile.TileFrameX / data.CoordinateFullWidth;
-            int row = tile.TileFrameY / data.CoordinateFullHeight;
+            int frameX = tile.TileFrameX;
+            int frameY = tile.TileFrameY;
+            int col = frameX.SafeDivide(data.CoordinateFullWidth);
+            int row = frameY.SafeDivide(data.CoordinateFullHeight);
 
             return data.StyleHorizontal ? col : row;
         }
@@ -61,19 +63,21 @@ namespace MoreBlockSwap
         {
             TileObjectData data = TileObjectData.GetTileData(tile);
             ModTile mTile = TileLoader.GetTile(tile.TileType);
+            int frameX = tile.TileFrameX;
+            int frameY = tile.TileFrameY;
 
             if ((mTile != null && mTile.OpenDoorID != -1) || tile.TileType == TileID.ClosedDoor)
             {
-                int row = tile.TileFrameY / data.CoordinateFullHeight;
-                int col = tile.TileFrameX / (data.CoordinateFullWidth * 3);
+                int row = frameY.SafeDivide(data.CoordinateFullHeight);
+                int col = frameX.SafeDivide(data.CoordinateFullWidth * 3);
 
                 style =  row + col * data.StyleWrapLimit;
                 return true;
             }
             else if ((mTile != null && mTile.CloseDoorID != -1) || tile.TileType == TileID.OpenDoor)
             {
-                int row = tile.TileFrameY / data.CoordinateFullHeight;
-                int col = tile.TileFrameX / (data.CoordinateFullWidth * 2);
+                int row = frameY.SafeDivide(data.CoordinateFullHeight);
+                int col = frameX.SafeDivide(data.CoordinateFullWidth * 2);
                 style =  row + col * 36;
                 return true;
             }
@@ -93,13 +97,14 @@ namespace MoreBlockSwap
                 return doorStyle;
             }
 
+            int frameX = tile.TileFrameX;
             return tile.TileType switch
             {
                 TileID.Saplings => 0, // makes all saplings drop acorns
                 TileID.Statues => calculatedStyle % 165,
-                TileID.Cannon => Math.Clamp(tile.TileFrameX / data.CoordinateFullWidth, 0, 3),
-                TileID.SillyBalloonTile => tile.TileFrameX / (data.CoordinateFullWidth * 2) * 2, // Purple = 0, Green = 2, Pink = 4
-                TileID.Campfire => tile.TileFrameX / data.CoordinateFullWidth, // Remove with 1.4.4
+                TileID.Cannon => Math.Clamp(frameX.SafeDivide(data.CoordinateFullWidth), 0, 3),
+                TileID.SillyBalloonTile => 2 * frameX.SafeDivide(data.CoordinateFullWidth * 2), // Purple = 0, Green = 2, Pink = 4
+                TileID.Campfire => frameX.SafeDivide(data.CoordinateFullWidth), // Remove with 1.4.4
 
                 TileID.GeyserTrap => 0,
                 TileID.BubbleMachine => 0,
@@ -164,10 +169,30 @@ namespace MoreBlockSwap
         public static Point16 TileEntityCoordinates(int tileCoordX, int tileCoordY, int size = 18, int width = 1, int height = 1)
         {
             Tile tile = Framing.GetTileSafely(tileCoordX, tileCoordY);
-            int posXAdjusted = tileCoordX - tile.TileFrameX / size % width;
-            int posYAdjusted = tileCoordY - tile.TileFrameY / size % height;
+            int frameX = tile.TileFrameX;
+            int frameY = tile.TileFrameY;
+            int posXAdjusted = tileCoordX - frameX.SafeDivide(size).SafeMod(width);
+            int posYAdjusted = tileCoordY - frameY.SafeDivide(size).SafeMod(height);
 
             return new Point16(posXAdjusted, posYAdjusted);
+        }
+
+        public static int SafeDivide(this int dividend, int divisor)
+        {
+            if(divisor == 0)
+            {
+                return dividend;
+            }
+            return dividend / divisor;
+        }
+
+        public static int SafeMod(this int lhs, int rhs)
+        {
+            if(rhs == 0)
+            {
+                return lhs;
+            }
+            return lhs % rhs;
         }
     }
 }
