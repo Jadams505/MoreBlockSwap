@@ -179,7 +179,8 @@ namespace MoreBlockSwap
             }
 
             Tile topLeftTile = Main.tile[topLeftX, topLeftY];
-            TileObjectData data = TileObjectData.GetTileData(topLeftTile);
+            TileObjectData heldData = TileObjectData.GetTileData(targetType, targetStyle);
+            TileObjectData replaceData = TileObjectData.GetTileData(topLeftTile);
             Point newTopLeftFrame = DetermineNewTileStart(targetType, targetStyle, topLeftX, topLeftY);
 
             if (topLeftTile.TileType == TileID.OpenDoor && targetType == TileID.ClosedDoor)
@@ -188,24 +189,24 @@ namespace MoreBlockSwap
             }
 
             int newFrameX = newTopLeftFrame.X;
-            for (int i = 0; i < data.Width; ++i)
+            for (int i = 0; i < replaceData.Width; ++i)
             {
                 int newFrameY = newTopLeftFrame.Y;
-                for (int j = 0; j < data.Height; ++j)
+                for (int j = 0; j < replaceData.Height; ++j)
                 {
                     Tile tile = Framing.GetTileSafely(topLeftX + i, topLeftY + j);
                     tile.TileType = targetType;
                     tile.TileFrameX = (short)newFrameX;
                     tile.TileFrameY = (short)newFrameY;
                     tile.Clear(TileDataType.TilePaint);
-                    newFrameY += data.CoordinateHeights[j] + data.CoordinatePadding;
+                    newFrameY += heldData.CoordinateHeights[j] + heldData.CoordinatePadding;
                 }
-                newFrameX += data.CoordinateWidth + data.CoordinatePadding;
+                newFrameX += heldData.CoordinateWidth + heldData.CoordinatePadding;
             }
 
-            for (int i = 0; i < data.Width; ++i)
+            for (int i = 0; i < replaceData.Width; ++i)
             {
-                for (int j = 0; j < data.Height; ++j)
+                for (int j = 0; j < replaceData.Height; ++j)
                 {
                     WorldGen.SquareTileFrame(topLeftX + i, topLeftY + j);
                 }
@@ -215,7 +216,7 @@ namespace MoreBlockSwap
         private static Point DetermineNewTileStart(ushort targetType, int targetStyle, int topLeftX, int topLeftY)
         {
             Tile topLeftTile = Main.tile[topLeftX, topLeftY];
-            TileObjectData data = TileObjectData.GetTileData(topLeftTile);
+            TileObjectData heldData = TileObjectData.GetTileData(targetType, targetStyle);
 
             if(GetCustomTileStart(targetType, targetStyle, topLeftTile) is Point customFrame)
             {
@@ -223,28 +224,30 @@ namespace MoreBlockSwap
             }
 
             Point newTopLeftFrame = new Point(topLeftTile.TileFrameX, topLeftTile.TileFrameY);
-            if (data != null)
+            if (heldData != null)
             {
-                bool canPlace = TileObject.CanPlace(topLeftX, topLeftY, targetType, targetStyle, 0, out TileObject placeData, onlyCheck: false, checkStay: true);
+                int xOffset = heldData != null ? heldData.Origin.X : 0;
+                int yOffset = heldData != null ? heldData.Origin.Y : 0;
+                bool canPlace = TileObject.CanPlace(topLeftX + xOffset, topLeftY + yOffset, targetType, targetStyle, 0, out TileObject placeData, onlyCheck: false, checkStay: true);
                 
-                int style = data.CalculatePlacementStyle(targetStyle, 0, placeData.random);
-                int adjustedStyle = 0;
+                int col = heldData.CalculatePlacementStyle(targetStyle, placeData.alternate, placeData.random);
+                int row = 0;
 
-                if (data.StyleWrapLimit > 0)
+                if (heldData.StyleWrapLimit > 0)
                 {
-                    adjustedStyle = style.SafeDivide(data.StyleWrapLimit) * data.StyleLineSkip;
-                    style %= data.StyleWrapLimit;
+                    row = col.SafeDivide(heldData.StyleWrapLimit) * heldData.StyleLineSkip;
+                    col %= heldData.StyleWrapLimit;
                 }
 
-                if (data.StyleHorizontal)
+                if (heldData.StyleHorizontal)
                 {
-                    newTopLeftFrame.X = data.CoordinateFullWidth * style;
-                    newTopLeftFrame.Y = data.CoordinateFullHeight * adjustedStyle;
+                    newTopLeftFrame.X = heldData.CoordinateFullWidth * col;
+                    newTopLeftFrame.Y = heldData.CoordinateFullHeight * row;
                 }
                 else
                 {
-                    newTopLeftFrame.X = data.CoordinateFullWidth * adjustedStyle;
-                    newTopLeftFrame.Y = data.CoordinateFullHeight * style;
+                    newTopLeftFrame.X = heldData.CoordinateFullWidth * row;
+                    newTopLeftFrame.Y = heldData.CoordinateFullHeight * col;
                 }
             }
 
