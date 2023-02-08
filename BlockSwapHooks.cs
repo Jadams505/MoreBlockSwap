@@ -32,12 +32,17 @@ namespace MoreBlockSwap
             }
 
             Point16 potentialTileEntityPos = BlockSwapUtil.TileEntityCoordinates(targetX, targetY, data.CoordinateWidth + data.CoordinatePadding, data.Width, data.Height);
-            if(TileEntity.ByPosition.TryGetValue(potentialTileEntityPos, out _))
+            if (TileEntity.ByPosition.TryGetValue(potentialTileEntityPos, out _))
             {
                 return false;
             }
 
-            if(tileToReplace.TileType == TileID.GemLocks && tileToReplace.TileFrameY >= 54)
+            if (IsValidForCrossTypeReplacement(heldTile, placeStyle, targetX, targetY, tileToReplace))
+            {
+                return true;
+            }
+
+            if (tileToReplace.TileType == TileID.GemLocks && tileToReplace.TileFrameY >= 54)
             {
                 return false; // prevents swappping gem locks when full to prevent networking issues
             }
@@ -49,13 +54,6 @@ namespace MoreBlockSwap
 
             if (heldTile == tileToReplace.TileType && heldTile < TileID.Count)
             {
-                /*
-                if (BlockSwapSystem.Instance.TilesThatDontWork.Contains(heldTile))
-                {
-                    return false;
-                }
-                */
-
                 int tileToReplaceItemPlaceStyle = BlockSwapUtil.GetItemPlaceStyleFromTile(tileToReplace);
                 if (data.RandomStyleRange > 0)
                 {
@@ -75,7 +73,7 @@ namespace MoreBlockSwap
 
             if (closeDoorId != -1)
             {
-                if(heldTileId == closeDoorId)
+                if (heldTileId == closeDoorId)
                 {
                     if (tileToReplacePlaceStyle != -1)
                     {
@@ -84,14 +82,32 @@ namespace MoreBlockSwap
                 }
             }
 
-            if(heldTileId == TileID.Saplings && tileToReplace.TileType == TileID.Saplings)
+            if (heldTileId == TileID.Saplings && tileToReplace.TileType == TileID.Saplings)
             {
                 return true;
             }
 
-            if(heldTileId == TileID.GemSaplings && tileToReplace.TileType == TileID.GemSaplings)
+            if (heldTileId == TileID.GemSaplings && tileToReplace.TileType == TileID.GemSaplings)
             {
                 return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsValidForCrossTypeReplacement(int heldTileId, int heldPlaceStyle, int targetX, int targetY, Tile tileToReplace)
+        {
+            TileObjectData heldData = TileObjectData.GetTileData(heldTileId, heldPlaceStyle);
+            TileObjectData replaceData = TileObjectData.GetTileData(tileToReplace);
+
+            if (heldData != null && replaceData != null &&
+                heldData.Width == replaceData.Width && heldData.Height == replaceData.Height &&
+                heldTileId != tileToReplace.TileType)
+            {
+                Point replaceTopLeft = TopLeftOfMultiTile(targetX, targetY, tileToReplace);
+                bool canPlace = TileObject.CanPlace(replaceTopLeft.X + heldData.Origin.X, replaceTopLeft.Y + heldData.Origin.Y, heldTileId, heldPlaceStyle, 0, out _, onlyCheck: false, checkStay: true);
+
+                return canPlace;
             }
 
             return false;
@@ -104,17 +120,25 @@ namespace MoreBlockSwap
                 orig(ref x, ref y, targetType, t);
                 return;
             }
-            TileObjectData data = TileObjectData.GetTileData(t);
+            Point topLeftPos = TopLeftOfMultiTile(x, y, t);
+            x = topLeftPos.X;
+            y = topLeftPos.Y;
+        }
+
+        private static Point TopLeftOfMultiTile(int tilePosX, int tilePosY, Tile tile)
+        {
+            TileObjectData data = TileObjectData.GetTileData(tile);
             if (data != null)
             {
-                int frameX = t.TileFrameX;
-                int frameY = t.TileFrameY;
+                int frameX = tile.TileFrameX;
+                int frameY = tile.TileFrameY;
 
                 int xAdjustment = frameX.SafeMod(data.CoordinateFullWidth).SafeDivide(data.CoordinateWidth + data.CoordinatePadding);
                 int yAdjustment = frameY.SafeMod(data.CoordinateFullHeight).SafeDivide(data.CoordinateHeights[0] + data.CoordinatePadding);
-                x -= xAdjustment;
-                y -= yAdjustment;
+                tilePosX -= xAdjustment;
+                tilePosY -= yAdjustment;
             }
+            return new Point(tilePosX, tilePosY);
         }
 
         internal static void WorldGen_KillTile_GetItemDrops(On.Terraria.WorldGen.orig_KillTile_GetItemDrops orig, int x, int y, Tile tileCache, out int dropItem, out int dropItemStack, out int secondaryItem, out int secondaryItemStack, bool includeLargeObjectDrops)
@@ -158,6 +182,11 @@ namespace MoreBlockSwap
             TileObjectData data = TileObjectData.GetTileData(topLeftTile);
             Point newTopLeftFrame = DetermineNewTileStart(targetType, targetStyle, topLeftX, topLeftY);
 
+            if (topLeftTile.TileType == TileID.OpenDoor && targetType == TileID.ClosedDoor)
+            {
+                targetType = TileID.OpenDoor;
+            }
+
             int newFrameX = newTopLeftFrame.X;
             for (int i = 0; i < data.Width; ++i)
             {
@@ -165,6 +194,7 @@ namespace MoreBlockSwap
                 for (int j = 0; j < data.Height; ++j)
                 {
                     Tile tile = Framing.GetTileSafely(topLeftX + i, topLeftY + j);
+                    tile.TileType = targetType;
                     tile.TileFrameX = (short)newFrameX;
                     tile.TileFrameY = (short)newFrameY;
                     tile.Clear(TileDataType.TilePaint);
