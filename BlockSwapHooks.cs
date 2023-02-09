@@ -154,7 +154,8 @@ namespace MoreBlockSwap
             {
                 int targetTileId = tileCache.TileType;
                 TileObjectData data = TileObjectData.GetTileData(tileCache);
-                int heldTile = Main.LocalPlayer.HeldItem.createTile;
+                Player playerToGiveDropsTo = Main.player[Player.FindClosest(new Vector2(x, y) * 16f, 16, 16)]; // Can't use Main.LocalPlayer because this is called on the server
+                int heldTile = playerToGiveDropsTo.HeldItem.createTile; // vanilla does this too so that means it works, right?
 
                 if (BlockSwapUtil.IsConversionCase(targetTileId, heldTile, out _, out int dropOverride))
                 {
@@ -191,108 +192,19 @@ namespace MoreBlockSwap
                 if(BlockSwapUtil.IsConversionCase(t.TileType, targetType, out int typeOverride, out _))
                 {
                     targetType = (ushort)typeOverride;
+                    ReplacementUtil.SingleTileSwap(targetType, targetStyle, topLeftX, topLeftY);
+                    return;
                 }
                 orig(targetType, targetStyle, topLeftX, topLeftY, t);
                 return;
             }
 
-            Tile topLeftTile = Main.tile[topLeftX, topLeftY];
-            TileObjectData heldData = TileObjectData.GetTileData(targetType, targetStyle);
-            TileObjectData replaceData = TileObjectData.GetTileData(topLeftTile);
-            Point newTopLeftFrame = DetermineNewTileStart(targetType, targetStyle, topLeftX, topLeftY);
-
-            if (topLeftTile.TileType == TileID.OpenDoor && targetType == TileID.ClosedDoor)
+            if (t.TileType == TileID.OpenDoor && targetType == TileID.ClosedDoor)
             {
                 targetType = TileID.OpenDoor;
             }
 
-            int newFrameX = newTopLeftFrame.X;
-            for (int i = 0; i < replaceData.Width; ++i)
-            {
-                int newFrameY = newTopLeftFrame.Y;
-                for (int j = 0; j < replaceData.Height; ++j)
-                {
-                    Tile tile = Framing.GetTileSafely(topLeftX + i, topLeftY + j);
-                    tile.TileType = targetType;
-                    tile.TileFrameX = (short)newFrameX;
-                    tile.TileFrameY = (short)newFrameY;
-                    tile.Clear(TileDataType.TilePaint);
-                    newFrameY += heldData.CoordinateHeights[j] + heldData.CoordinatePadding;
-                }
-                newFrameX += heldData.CoordinateWidth + heldData.CoordinatePadding;
-            }
-
-            for (int i = 0; i < replaceData.Width; ++i)
-            {
-                for (int j = 0; j < replaceData.Height; ++j)
-                {
-                    WorldGen.SquareTileFrame(topLeftX + i, topLeftY + j);
-                }
-            }
-        }
-
-        private static Point DetermineNewTileStart(ushort targetType, int targetStyle, int topLeftX, int topLeftY)
-        {
-            Tile topLeftTile = Main.tile[topLeftX, topLeftY];
-            TileObjectData heldData = TileObjectData.GetTileData(targetType, targetStyle);
-
-            if(GetCustomTileStart(targetType, targetStyle, topLeftTile) is Point customFrame)
-            {
-                return customFrame;
-            }
-
-            Point newTopLeftFrame = new Point(topLeftTile.TileFrameX, topLeftTile.TileFrameY);
-            if (heldData != null)
-            {
-                int xOffset = heldData != null ? heldData.Origin.X : 0;
-                int yOffset = heldData != null ? heldData.Origin.Y : 0;
-                bool canPlace = TileObject.CanPlace(topLeftX + xOffset, topLeftY + yOffset, targetType, targetStyle, 0, out TileObject placeData, onlyCheck: false, checkStay: true);
-                
-                int col = heldData.CalculatePlacementStyle(targetStyle, placeData.alternate, placeData.random);
-                int row = 0;
-
-                if (heldData.StyleWrapLimit > 0)
-                {
-                    row = col.SafeDivide(heldData.StyleWrapLimit) * heldData.StyleLineSkip;
-                    col %= heldData.StyleWrapLimit;
-                }
-
-                if (heldData.StyleHorizontal)
-                {
-                    newTopLeftFrame.X = heldData.CoordinateFullWidth * col;
-                    newTopLeftFrame.Y = heldData.CoordinateFullHeight * row;
-                }
-                else
-                {
-                    newTopLeftFrame.X = heldData.CoordinateFullWidth * row;
-                    newTopLeftFrame.Y = heldData.CoordinateFullHeight * col;
-                }
-            }
-
-            return newTopLeftFrame;
-        }
-
-        private static Point? GetCustomTileStart(ushort targetType, int targetStyle, Tile topLeftTile)
-        {
-            if (targetType == TileID.ClosedDoor && topLeftTile.TileType == TileID.OpenDoor)
-            {
-                if (BlockSwapUtil.GetPlaceStyleForDoor(topLeftTile, out int doorStyle))
-                {
-                    int normalizedReplaceStyle = doorStyle % 36;
-                    int normalizedTargetStyle = targetStyle % 36;
-                    int styleDiff = normalizedTargetStyle - normalizedReplaceStyle;
-
-                    int replaceCol = doorStyle / 36;
-                    int targetCol = targetStyle / 36;
-                    int colDiff = targetCol - replaceCol;
-
-                    int newTopLeftX = colDiff * 72 + topLeftTile.TileFrameX;
-                    int newTopLeftY = styleDiff * 54 + topLeftTile.TileFrameY;
-
-                    return new Point(newTopLeftX, newTopLeftY);
-                }
-            }
-            return null;
+            ReplacementUtil.MultiTileSwap(targetType, targetStyle, topLeftX, topLeftY);
         }
     }
 }

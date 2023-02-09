@@ -248,3 +248,53 @@ TileID.SliceOfCake,
 TileID.TeaKettle,
 TileID.PottedCrystalPlants, // merge with PottedPlants1
 TileID.PaintedArrowSign, // merge with arrow sign
+
+27, 20, 227, 24, 201, 110, 113, 61, 74, 
+71, 3, 73, 186, 187, 185, 233, 530, 236, 
+238, 254, 484, 485, 84, 82, 83, 529, 549, 
+590, 595, 615, 624, 637
+ReplaceTileBreakUp:
+Sunflower // dirt (pure-hallow)
+Saplings // dirt
+DyePlants // any
+CorruptPlants // dirt (corrupt)
+CrimsonPlants // dirt (corrupt)
+HallowedPlants // dirt (hallow)
+HallowedPlants2 // dirt (hallow)
+JunglePlants // mud (jungle)
+JunglePlants2 // mud (jungle)
+MushroomPlants // mud (glowing)
+Plants // dirt (pure)
+Plants2 // dirt (pure)
+LargePiles // dirt mud stone
+LargePiles2 // dirt mud stone
+SmallPiles // dirt mud stone
+PlantDetritus // mud
+OasisPlants // sand
+LifeFruit // mud
+PlanteraBulb // mud
+Pumpkins // dirt
+RollingCactus // any
+AntlionLarva // any
+BloomingHerbs // varies
+ImmatureHerbs // varies
+MatureHerbs // varies
+SeaOats // sand
+Seaweed // sand
+GemSaplings // stone
+VanityTreeSakuraSaplings // dirt mud (any)
+VanityTreeWillowSaplings // dirt mud (any)
+AbigailsFlower // dirt (any?)
+AshPlants // ash
+
+205, 115, 62, 52, 382, 444, 528, 638, 636
+ReplaceTileBreakDown:
+CrimsonVines // dirt
+HallowedVines // dirt
+JungleVines // dirt
+Vines // dirt
+VineFlowers // dirt
+BeeHive // any
+MushroomVines // mud
+AshVines // ash
+CorruptVines // dirt
