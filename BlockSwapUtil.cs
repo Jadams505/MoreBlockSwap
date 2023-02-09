@@ -159,11 +159,11 @@ namespace MoreBlockSwap
             TileObjectData heldTileData = TileObjectData.GetTileData(targetType, 0);
             int replaceType = tileToReplace.TileType;
             return toReplaceData == null || heldTileData == null ||
-                TileID.Sets.BasicChest[targetType] || TileID.Sets.BasicChest[replaceType] ||
-                TileID.Sets.BasicDresser[targetType] || TileID.Sets.BasicDresser[replaceType] ||
-                /*targetType == TileID.Campfire || replaceType == TileID.Campfire ||*/
-                TileID.Sets.Platforms[targetType] || TileID.Sets.Platforms[replaceType] ||
-                TileID.Sets.Torch[targetType] || TileID.Sets.Torch[replaceType];
+                (TileID.Sets.BasicChest[targetType] && TileID.Sets.BasicChest[replaceType]) ||
+                (TileID.Sets.BasicDresser[targetType] && TileID.Sets.BasicDresser[replaceType]) ||
+                /*(targetType == TileID.Campfire && replaceType == TileID.Campfire) ||*/
+                (TileID.Sets.Platforms[targetType] && TileID.Sets.Platforms[replaceType]) ||
+                (TileID.Sets.Torch[targetType] && TileID.Sets.Torch[replaceType]);
         }
 
         public static Point16 TileEntityCoordinates(int tileCoordX, int tileCoordY, int size = 18, int width = 1, int height = 1)
