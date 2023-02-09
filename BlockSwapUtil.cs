@@ -172,8 +172,26 @@ namespace MoreBlockSwap
             drop = 0;
             if(replaceTile != heldTile)
             {
+                if (replaceTile == TileID.GolfGrass && heldTile == TileID.HallowedGrass)
+                {
+                    swapTileId = TileID.GolfGrassHallowed;
+                    return true;
+                }
+
+                if (replaceTile == TileID.GolfGrassHallowed && heldTile == TileID.Grass)
+                {
+                    swapTileId = TileID.GolfGrass;
+                    return true;
+                }
+
                 if (TileID.Sets.Conversion.Grass[replaceTile] && TileID.Sets.Conversion.Grass[heldTile])
                 {
+                    if ((replaceTile == TileID.GolfGrassHallowed && heldTile == TileID.HallowedGrass) || // can't swap mowed hallow and hallow grass
+                        (replaceTile == TileID.GolfGrass && heldTile == TileID.Grass) || // can't swap mowed and regular grass
+                        (replaceTile == TileID.JungleGrass || heldTile == TileID.JungleGrass)) // can't swap any dirt based grass with jungle grass
+                    {
+                        return false;
+                    }
                     return true;
                 }
 
