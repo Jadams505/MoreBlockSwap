@@ -26,6 +26,11 @@ namespace MoreBlockSwap
             Tile tileToReplace = Main.tile[targetX, targetY];
             TileObjectData data = TileObjectData.GetTileData(tileToReplace);
 
+            if (BlockSwapUtil.IsConversionCase(tileToReplace.TileType, heldTile, out _, out _))
+            {
+                return true;
+            }
+
             if (data == null)
             {
                 return false;
@@ -144,23 +149,32 @@ namespace MoreBlockSwap
         internal static void WorldGen_KillTile_GetItemDrops(On.Terraria.WorldGen.orig_KillTile_GetItemDrops orig, int x, int y, Tile tileCache, out int dropItem, out int dropItemStack, out int secondaryItem, out int secondaryItemStack, bool includeLargeObjectDrops)
         {
             orig(x, y, tileCache, out dropItem, out dropItemStack, out secondaryItem, out secondaryItemStack, includeLargeObjectDrops);
-            if (dropItem > 0)
-            {
-                return;
-            }
+            
             if (includeLargeObjectDrops) // Only true when called in WorldGen.ReplaceTile
             {
+                int targetTileId = tileCache.TileType;
                 TileObjectData data = TileObjectData.GetTileData(tileCache);
+                int heldTile = Main.LocalPlayer.HeldItem.createTile;
+
+                if (BlockSwapUtil.IsConversionCase(targetTileId, heldTile, out _, out int dropOverride))
+                {
+                    dropItem = dropOverride;
+                    return;
+                }
+
+                if (dropItem > 0)
+                {
+                    return;
+                }
+
                 if (data != null)
                 {
-                    int style = BlockSwapUtil.GetItemPlaceStyleFromTile(tileCache);
-                    int targetTileId = tileCache.TileType;
-
                     if(targetTileId == TileID.OpenDoor)
                     {
                         targetTileId = TileID.ClosedDoor;
                     }
 
+                    int style = BlockSwapUtil.GetItemPlaceStyleFromTile(tileCache);
                     int drop = BlockSwapUtil.GetItemDrop(targetTileId, style);
                     if (drop != -1)
                     {
@@ -174,6 +188,10 @@ namespace MoreBlockSwap
         {
             if (BlockSwapUtil.ShouldVanillaHandleSwap(targetType, t))
             {
+                if(BlockSwapUtil.IsConversionCase(t.TileType, targetType, out int typeOverride, out _))
+                {
+                    targetType = (ushort)typeOverride;
+                }
                 orig(targetType, targetStyle, topLeftX, topLeftY, t);
                 return;
             }

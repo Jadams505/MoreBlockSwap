@@ -166,6 +166,81 @@ namespace MoreBlockSwap
                 (TileID.Sets.Torch[targetType] && TileID.Sets.Torch[replaceType]);
         }
 
+        public static bool IsConversionCase(int replaceTile, int heldTile, out int swapTileId, out int drop)
+        {
+            swapTileId = heldTile;
+            drop = 0;
+            if(replaceTile != heldTile)
+            {
+                if (TileID.Sets.Conversion.Grass[replaceTile] && TileID.Sets.Conversion.Grass[heldTile])
+                {
+                    return true;
+                }
+
+                if (TileID.Sets.Conversion.Moss[replaceTile])
+                {
+                    if (TileID.Sets.Conversion.Moss[heldTile])
+                    {
+                        return true;
+                    }
+
+                    if(heldTile == TileID.GrayBrick)
+                    {
+                        swapTileId = MossConversion(replaceTile);
+                        drop = ItemID.StoneBlock;
+                        return swapTileId != -1;
+                    }
+                }
+
+                if (TileID.Sets.Conversion.MossBrick[replaceTile])
+                {
+                    if (TileID.Sets.Conversion.Moss[heldTile])
+                    {
+                        swapTileId = MossConversion(heldTile);
+                        return swapTileId != -1 && replaceTile != swapTileId;
+                    }
+
+                    if(heldTile == TileID.Stone)
+                    {
+                        swapTileId = MossConversion(replaceTile);
+                        drop = ItemID.GrayBrick;
+                        return swapTileId != -1;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private static int MossConversion(int mossTileId)
+        {
+            return mossTileId switch
+            {
+                182 => 515,
+                515 => 182,
+                180 => 513,
+                513 => 180,
+                179 => 512,
+                512 => 179,
+                381 => 517,
+                517 => 381,
+                534 => 535,
+                535 => 534,
+                536 => 537,
+                537 => 536,
+                539 => 540,
+                540 => 539,
+                625 => 626,
+                626 => 625,
+                627 => 628,
+                628 => 627,
+                183 => 516,
+                516 => 183,
+                181 => 514,
+                514 => 181,
+                _ => -1,
+            };
+        }
+
         public static Point16 TileEntityCoordinates(int tileCoordX, int tileCoordY, int size = 18, int width = 1, int height = 1)
         {
             Tile tile = Framing.GetTileSafely(tileCoordX, tileCoordY);
