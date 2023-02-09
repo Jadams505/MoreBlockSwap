@@ -177,6 +177,12 @@ namespace MoreBlockSwap
                     return true;
                 }
 
+                if ((replaceTile == TileID.JungleGrass && heldTile == TileID.MushroomGrass) ||
+                    (replaceTile == TileID.MushroomGrass && heldTile == TileID.JungleGrass))
+                {
+                    return true;
+                }
+
                 if (TileID.Sets.Conversion.Moss[replaceTile])
                 {
                     if (TileID.Sets.Conversion.Moss[heldTile])
