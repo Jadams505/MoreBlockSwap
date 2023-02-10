@@ -62,6 +62,11 @@ namespace MoreBlockSwap
             TileObjectData replaceData = TileObjectData.GetTileData(topLeftTile);
             Point newTopLeftFrame = DetermineNewTileStart(targetType, targetStyle, topLeftX, topLeftY);
 
+            if (replaceData.Width == 1 && replaceData.Height == 1)
+            {
+                ClearSlopeFor1x1Tile(targetType, targetStyle, topLeftX, topLeftY);
+            }
+
             int newFrameX = newTopLeftFrame.X;
             for (int i = 0; i < replaceData.Width; ++i)
             {
@@ -84,6 +89,19 @@ namespace MoreBlockSwap
                 {
                     WorldGen.SquareTileFrame(topLeftX + i, topLeftY + j);
                 }
+            }
+        }
+
+        // Most 1x1 tiles with TileObjectData cannot be sloped
+        // Exceptions: Metal Bars and Platforms
+        public static void ClearSlopeFor1x1Tile(ushort targetType, int targetStyle, int topLeftX, int topLeftY)
+        {
+            Tile replaceTile = Framing.GetTileSafely(topLeftX, topLeftY);
+
+            if(targetType != replaceTile.TileType)
+            {
+                replaceTile.Slope = SlopeType.Solid;
+                replaceTile.IsHalfBlock = false;
             }
         }
 

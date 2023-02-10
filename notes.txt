@@ -298,3 +298,26 @@ BeeHive // any
 MushroomVines // mud
 AshVines // ash
 CorruptVines // dirt
+
+2, 60, 70, 109, 199, 23, 661, 662, 633
+DoesntPlaceWithTileReplacement:
+Grass
+JungleGrass
+MushroomGrass
+HallowedGrass
+CrimsonGrass
+CorruptGrass
+CorruptJungleGrass
+CrimsonJungleGrass
+AshGrass
+
+58, 225, 171, 127, 481, 482, 483, 423
+DoesntGetReplacedWithTileReplacement:
+Hellstone
+Hive
+ChristmasTree
+MagicalIceBlock
+CrackedBlueDungeonBrick
+CrackedGreenDungeonBrick
+CrackedPinkDungeonBrick
+LogicSensor

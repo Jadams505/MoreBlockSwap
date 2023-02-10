@@ -26,6 +26,11 @@ namespace MoreBlockSwap
             Tile tileToReplace = Main.tile[targetX, targetY];
             TileObjectData data = TileObjectData.GetTileData(tileToReplace);
 
+            if (SwapValidityUtil.IsInvalidForReplacement(tileToReplace))
+            {
+                return false;
+            }
+
             if (BlockSwapUtil.IsConversionCase(tileToReplace.TileType, heldTile, out _, out _))
             {
                 return true;
@@ -42,17 +47,12 @@ namespace MoreBlockSwap
                 return false;
             }
 
-            if (IsValidForCrossTypeReplacement(heldTile, placeStyle, targetX, targetY, tileToReplace))
+            if (SwapValidityUtil.IsValidForCrossTypeReplacement(heldTile, placeStyle, targetX, targetY, tileToReplace))
             {
                 return true;
             }
 
-            if (tileToReplace.TileType == TileID.GemLocks && tileToReplace.TileFrameY >= 54)
-            {
-                return false; // prevents swappping gem locks when full to prevent networking issues
-            }
-
-            if (IsValidForReplacementCustom(heldTile, placeStyle, tileToReplace))
+            if (SwapValidityUtil.IsValidForReplacementCustom(heldTile, placeStyle, tileToReplace))
             {
                 return true;
             }
@@ -69,55 +69,6 @@ namespace MoreBlockSwap
             return false;
         }
 
-        private static bool IsValidForReplacementCustom(int heldTileId, int heldPlaceStyle, Tile tileToReplace)
-        {
-            int tileToReplacePlaceStyle = BlockSwapUtil.GetItemPlaceStyleFromTile(tileToReplace);
-            TileObjectData tileToReplaceData = TileObjectData.GetTileData(tileToReplace);
-            int tileToReplaceRealStyle = TileObjectData.GetTileStyle(tileToReplace);
-            int closeDoorId = TileLoader.CloseDoorID(tileToReplace);
-
-            if (closeDoorId != -1)
-            {
-                if (heldTileId == closeDoorId)
-                {
-                    if (tileToReplacePlaceStyle != -1)
-                    {
-                        return heldPlaceStyle != tileToReplacePlaceStyle;
-                    }
-                }
-            }
-
-            if (heldTileId == TileID.Saplings && tileToReplace.TileType == TileID.Saplings)
-            {
-                return true;
-            }
-
-            if (heldTileId == TileID.GemSaplings && tileToReplace.TileType == TileID.GemSaplings)
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private static bool IsValidForCrossTypeReplacement(int heldTileId, int heldPlaceStyle, int targetX, int targetY, Tile tileToReplace)
-        {
-            TileObjectData heldData = TileObjectData.GetTileData(heldTileId, heldPlaceStyle);
-            TileObjectData replaceData = TileObjectData.GetTileData(tileToReplace);
-
-            if (heldData != null && replaceData != null &&
-                heldData.Width == replaceData.Width && heldData.Height == replaceData.Height &&
-                heldTileId != tileToReplace.TileType)
-            {
-                Point replaceTopLeft = TopLeftOfMultiTile(targetX, targetY, tileToReplace);
-                bool canPlace = TileObject.CanPlace(replaceTopLeft.X + heldData.Origin.X, replaceTopLeft.Y + heldData.Origin.Y, heldTileId, heldPlaceStyle, 0, out _, onlyCheck: false, checkStay: true);
-
-                return canPlace;
-            }
-
-            return false;
-        }
-
         internal static void WorldGen_MoveReplaceTileAnchor(On.Terraria.WorldGen.orig_MoveReplaceTileAnchor orig, ref int x, ref int y, ushort targetType, Tile t)
         {
             if (BlockSwapUtil.ShouldVanillaHandleSwap(targetType, t))
@@ -125,25 +76,9 @@ namespace MoreBlockSwap
                 orig(ref x, ref y, targetType, t);
                 return;
             }
-            Point topLeftPos = TopLeftOfMultiTile(x, y, t);
+            Point topLeftPos = BlockSwapUtil.TopLeftOfMultiTile(x, y, t);
             x = topLeftPos.X;
             y = topLeftPos.Y;
-        }
-
-        private static Point TopLeftOfMultiTile(int tilePosX, int tilePosY, Tile tile)
-        {
-            TileObjectData data = TileObjectData.GetTileData(tile);
-            if (data != null)
-            {
-                int frameX = tile.TileFrameX;
-                int frameY = tile.TileFrameY;
-
-                int xAdjustment = frameX.SafeMod(data.CoordinateFullWidth).SafeDivide(data.CoordinateWidth + data.CoordinatePadding);
-                int yAdjustment = frameY.SafeMod(data.CoordinateFullHeight).SafeDivide(data.CoordinateHeights[0] + data.CoordinatePadding);
-                tilePosX -= xAdjustment;
-                tilePosY -= yAdjustment;
-            }
-            return new Point(tilePosX, tilePosY);
         }
 
         internal static void WorldGen_KillTile_GetItemDrops(On.Terraria.WorldGen.orig_KillTile_GetItemDrops orig, int x, int y, Tile tileCache, out int dropItem, out int dropItemStack, out int secondaryItem, out int secondaryItemStack, bool includeLargeObjectDrops)

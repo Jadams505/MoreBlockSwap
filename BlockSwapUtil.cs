@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -263,6 +264,22 @@ namespace MoreBlockSwap
                 514 => 181,
                 _ => -1,
             };
+        }
+
+        public static Point TopLeftOfMultiTile(int tilePosX, int tilePosY, Tile tile)
+        {
+            TileObjectData data = TileObjectData.GetTileData(tile);
+            if (data != null)
+            {
+                int frameX = tile.TileFrameX;
+                int frameY = tile.TileFrameY;
+
+                int xAdjustment = frameX.SafeMod(data.CoordinateFullWidth).SafeDivide(data.CoordinateWidth + data.CoordinatePadding);
+                int yAdjustment = frameY.SafeMod(data.CoordinateFullHeight).SafeDivide(data.CoordinateHeights[0] + data.CoordinatePadding);
+                tilePosX -= xAdjustment;
+                tilePosY -= yAdjustment;
+            }
+            return new Point(tilePosX, tilePosY);
         }
 
         public static Point16 TileEntityCoordinates(int tileCoordX, int tileCoordY, int size = 18, int width = 1, int height = 1)
