@@ -16,8 +16,7 @@ namespace MoreBlockSwap
             replaceTile.TileType = targetType;
             replaceTile.Clear(TileDataType.TilePaint);
 
-            bool flag = !WorldGen.CanPoundTile(topLeftX, topLeftY);
-            if (flag)
+            if (!WorldGen.CanPoundTile(topLeftX, topLeftY))
             {
                 replaceTile.Slope = SlopeType.Solid;
                 replaceTile.IsHalfBlock = false;
@@ -60,7 +59,7 @@ namespace MoreBlockSwap
             Tile topLeftTile = Main.tile[topLeftX, topLeftY];
             TileObjectData heldData = TileObjectData.GetTileData(targetType, targetStyle);
             TileObjectData replaceData = TileObjectData.GetTileData(topLeftTile);
-            Point newTopLeftFrame = DetermineNewTileStart(targetType, targetStyle, topLeftX, topLeftY);
+            Point newTopLeftFrame = DetermineNewTileStart(targetType, targetStyle, topLeftX, topLeftY, out TileObject placeData);
 
             if (replaceData.Width == 1 && replaceData.Height == 1)
             {
@@ -81,6 +80,12 @@ namespace MoreBlockSwap
                     newFrameY += heldData.CoordinateHeights[j] + heldData.CoordinatePadding;
                 }
                 newFrameX += heldData.CoordinateWidth + heldData.CoordinatePadding;
+            }
+
+            if(placeData.type != 0 && heldData.HookPostPlaceMyPlayer.hook != null) 
+            {
+                // Very important for tile entities
+                heldData.HookPostPlaceMyPlayer.hook(topLeftX + heldData.Origin.X, topLeftY + heldData.Origin.Y, placeData.type, placeData.style, 0, placeData.alternate);
             }
 
             for (int i = 0; i < replaceData.Width; ++i)
@@ -105,10 +110,11 @@ namespace MoreBlockSwap
             }
         }
 
-        private static Point DetermineNewTileStart(ushort targetType, int targetStyle, int topLeftX, int topLeftY)
+        private static Point DetermineNewTileStart(ushort targetType, int targetStyle, int topLeftX, int topLeftY, out TileObject placeData)
         {
             Tile topLeftTile = Main.tile[topLeftX, topLeftY];
             TileObjectData heldData = TileObjectData.GetTileData(targetType, targetStyle);
+            placeData = default;
 
             if (GetCustomTileStart(targetType, targetStyle, topLeftTile) is Point customFrame)
             {
@@ -120,7 +126,7 @@ namespace MoreBlockSwap
             {
                 int xOffset = heldData != null ? heldData.Origin.X : 0;
                 int yOffset = heldData != null ? heldData.Origin.Y : 0;
-                bool canPlace = TileObject.CanPlace(topLeftX + xOffset, topLeftY + yOffset, targetType, targetStyle, 0, out TileObject placeData, onlyCheck: false, checkStay: true);
+                bool canPlace = TileObject.CanPlace(topLeftX + xOffset, topLeftY + yOffset, targetType, targetStyle, 0, out placeData, onlyCheck: false, checkStay: true);
 
                 int col = heldData.CalculatePlacementStyle(targetStyle, placeData.alternate, placeData.random);
                 int row = 0;

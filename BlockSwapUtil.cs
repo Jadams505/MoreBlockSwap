@@ -119,6 +119,8 @@ namespace MoreBlockSwap
                 TileID.PaintedArrowSign => 0,
                 TileID.TatteredWoodSign => 0,
                 TileID.Lever => 0,
+                TileID.CatBast => 0,
+                TileID.LawnFlamingo => 0,
 
                 _ => -1
             };

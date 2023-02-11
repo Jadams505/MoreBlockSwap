@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
+using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
@@ -52,6 +53,35 @@ namespace MoreBlockSwap
                 bool canPlace = TileObject.CanPlace(replaceTopLeft.X + heldData.Origin.X, replaceTopLeft.Y + heldData.Origin.Y, heldTileId, heldPlaceStyle, 0, out _, onlyCheck: false, checkStay: true);
 
                 return canPlace;
+            }
+
+            return false;
+        }
+
+        // This is used to stop replacing tile entity like tiles
+        // This is because they require clean up that simple replacing can't handle
+        public static bool IsInvalidTileEntityLikeTile(int x, int y)
+        {
+            Tile tileToReplace = Framing.GetTileSafely(x, y);
+            TileObjectData replaceData = TileObjectData.GetTileData(tileToReplace);
+            Point16 potentialTileEntityPos = new Point16(x, y);
+
+            if(replaceData != null)
+            {
+                // Vanilla tile entities/chests/dressers use this
+                // Chests and dressers are not tile entities so this is important
+                if (replaceData.HookPostPlaceMyPlayer.hook != null)
+                {
+                    return true;
+                }
+
+                potentialTileEntityPos = BlockSwapUtil.TileEntityCoordinates(x, y, replaceData.CoordinateWidth + replaceData.CoordinatePadding, replaceData.Width, replaceData.Height);
+            }
+
+            // Secondary check for actual tile entities
+            if (TileEntity.ByPosition.TryGetValue(potentialTileEntityPos, out _))
+            {
+                return true;
             }
 
             return false;

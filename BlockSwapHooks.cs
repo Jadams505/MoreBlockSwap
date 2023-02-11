@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
-using Terraria.ModLoader;
 using Terraria.ObjectData;
 
 namespace MoreBlockSwap
@@ -36,13 +34,12 @@ namespace MoreBlockSwap
                 return true;
             }
 
-            if (data == null)
+            if (SwapValidityUtil.IsInvalidTileEntityLikeTile(targetX, targetY))
             {
                 return false;
             }
 
-            Point16 potentialTileEntityPos = BlockSwapUtil.TileEntityCoordinates(targetX, targetY, data.CoordinateWidth + data.CoordinatePadding, data.Width, data.Height);
-            if (TileEntity.ByPosition.TryGetValue(potentialTileEntityPos, out _))
+            if (data == null)
             {
                 return false;
             }
