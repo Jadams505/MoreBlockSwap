@@ -62,11 +62,6 @@ namespace MoreBlockSwap
             TileObjectData replaceData = TileObjectData.GetTileData(topLeftTile);
             Point newTopLeftFrame = DetermineNewTileStart(targetType, targetStyle, topLeftX, topLeftY, out TileObject placeData);
 
-            if (replaceData.Width == 1 && replaceData.Height == 1)
-            {
-                ClearSlopeFor1x1Tile(targetType, targetStyle, topLeftX, topLeftY);
-            }
-
             int newFrameX = newTopLeftFrame.X;
             for (int i = 0; i < replaceData.Width; ++i)
             {
@@ -74,6 +69,7 @@ namespace MoreBlockSwap
                 for (int j = 0; j < replaceData.Height; ++j)
                 {
                     Tile tile = Framing.GetTileSafely(topLeftX + i, topLeftY + j);
+                    ClearSlopeForMultiTile(targetType, targetStyle, topLeftX, topLeftY);
                     tile.TileType = targetType;
                     tile.TileFrameX = (short)newFrameX;
                     tile.TileFrameY = (short)newFrameY;
@@ -110,9 +106,9 @@ namespace MoreBlockSwap
             }
         }
 
-        // Most 1x1 tiles with TileObjectData cannot be sloped
-        // Exceptions: Metal Bars and Platforms
-        public static void ClearSlopeFor1x1Tile(ushort targetType, int targetStyle, int topLeftX, int topLeftY)
+        // Most tiles with TileObjectData cannot be sloped
+        // Exceptions: Metal Bars, Platforms, Teleporter
+        public static void ClearSlopeForMultiTile(ushort targetType, int targetStyle, int topLeftX, int topLeftY)
         {
             Tile replaceTile = Framing.GetTileSafely(topLeftX, topLeftY);
 

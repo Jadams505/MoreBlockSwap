@@ -121,6 +121,8 @@ namespace MoreBlockSwap
                 TileID.Lever => 0,
                 TileID.CatBast => 0,
                 TileID.LawnFlamingo => 0,
+                TileID.SnowballLauncher => 0,
+                TileID.Lampposts => 0,
 
                 _ => -1
             };
@@ -152,6 +154,7 @@ namespace MoreBlockSwap
             {
                 TileID.Sandcastles => ItemID.SandBlock,
                 TileID.TrapdoorOpen => ItemID.Trapdoor,
+                TileID.TallGateOpen => ItemID.TallGate,
                 _ => -1,
             };
         }
@@ -277,22 +280,29 @@ namespace MoreBlockSwap
                 int frameY = tile.TileFrameY;
 
                 int xAdjustment = frameX.SafeMod(data.CoordinateFullWidth).SafeDivide(data.CoordinateWidth + data.CoordinatePadding);
-                int yAdjustment = frameY.SafeMod(data.CoordinateFullHeight).SafeDivide(data.CoordinateHeights[0] + data.CoordinatePadding);
+                int yAdjustment = 0;
+
+                int yInnerFrame = frameY.SafeMod(data.CoordinateFullHeight);
+                while(yAdjustment < data.CoordinateHeights.Length && yInnerFrame > 0)
+                {
+                    yInnerFrame -= (data.CoordinateHeights[yAdjustment] + data.CoordinatePadding);
+                    yAdjustment++;
+                }
+
                 tilePosX -= xAdjustment;
                 tilePosY -= yAdjustment;
             }
             return new Point(tilePosX, tilePosY);
         }
 
-        public static Point16 TileEntityCoordinates(int tileCoordX, int tileCoordY, int size = 18, int width = 1, int height = 1)
+        // This assumes that tile entites are placed in the top left of multi-tiles
+        // But even vanilla doesn't match this pattern (weapon rack, and item frames)
+        public static Point16 TileEntityCoordinates(int tileCoordX, int tileCoordY)
         {
             Tile tile = Framing.GetTileSafely(tileCoordX, tileCoordY);
-            int frameX = tile.TileFrameX;
-            int frameY = tile.TileFrameY;
-            int posXAdjusted = tileCoordX - frameX.SafeDivide(size).SafeMod(width);
-            int posYAdjusted = tileCoordY - frameY.SafeDivide(size).SafeMod(height);
+            Point topLeft = TopLeftOfMultiTile(tileCoordX, tileCoordY, tile);
 
-            return new Point16(posXAdjusted, posYAdjusted);
+            return new Point16(topLeft.X, topLeft.Y);
         }
 
         public static int SafeDivide(this int dividend, int divisor)

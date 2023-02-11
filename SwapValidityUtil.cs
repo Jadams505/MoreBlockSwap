@@ -82,7 +82,7 @@ namespace MoreBlockSwap
                     return true;
                 }
 
-                potentialTileEntityPos = BlockSwapUtil.TileEntityCoordinates(x, y, replaceData.CoordinateWidth + replaceData.CoordinatePadding, replaceData.Width, replaceData.Height);
+                potentialTileEntityPos = BlockSwapUtil.TileEntityCoordinates(x, y);
             }
 
             // Secondary check for actual tile entities
@@ -101,6 +101,7 @@ namespace MoreBlockSwap
                 TileID.DemonAltar => true,
                 TileID.GemLocks => tileToReplace.TileFrameY >= 54, // prevents swappping gem locks when full to prevent networking issues
                 TileID.Boulder => true, // forces you to break them and deal with consequences :)
+                TileID.ChristmasTree => true, // Does strange things with its framing to account for christmas lights
                 var x when TileID.Sets.BreakableWhenPlacing[x] => true, // These tiles are supposed to break so replacement is effectively already achieved
                 var x when Main.tileCut[x] => true, // These tiles break when swinging so same as above
                 _ => false,
