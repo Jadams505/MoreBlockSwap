@@ -89,15 +89,13 @@ namespace MoreBlockSwap
 
         public static bool IsInvalidForReplacement(Tile tileToReplace)
         {
-            switch (tileToReplace.TileType)
+            return tileToReplace.TileType switch
             {
-                case TileID.DemonAltar: 
-                    return true;
-                case TileID.GemLocks:
-                    return tileToReplace.TileFrameY >= 54; // prevents swappping gem locks when full to prevent networking issues
-            }
-
-            return false;
+                TileID.DemonAltar => true,
+                TileID.GemLocks => tileToReplace.TileFrameY >= 54, // prevents swappping gem locks when full to prevent networking issues
+                var x when TileID.Sets.BreakableWhenPlacing[x] => true,
+                _ => false,
+            };
         }
     }
 }
