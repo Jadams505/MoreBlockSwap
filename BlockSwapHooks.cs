@@ -34,7 +34,7 @@ namespace MoreBlockSwap
                 return true;
             }
 
-            if (SwapValidityUtil.IsInvalidTileEntityLikeTile(targetX, targetY))
+            if (SwapValidityUtil.IsInvalidTileEntityLikeTile(heldTile, placeStyle, targetX, targetY))
             {
                 return false;
             }

@@ -148,12 +148,12 @@ namespace MoreBlockSwap
 
         public static int GetCustomDrop(int targetTileId, int targetStyle)
         {
-            switch (targetTileId)
+            return targetTileId switch
             {
-                case TileID.Sandcastles:
-                    return ItemID.SandBlock;
-            }
-            return -1;
+                TileID.Sandcastles => ItemID.SandBlock,
+                TileID.TrapdoorOpen => ItemID.Trapdoor,
+                _ => -1,
+            };
         }
 
         public static bool ShouldVanillaHandleSwap(int targetType, Tile tileToReplace)

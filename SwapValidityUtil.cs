@@ -58,13 +58,20 @@ namespace MoreBlockSwap
             return false;
         }
 
-        // This is used to stop replacing tile entity like tiles
-        // This is because they require clean up that simple replacing can't handle
-        public static bool IsInvalidTileEntityLikeTile(int x, int y)
+        // This is used to stop swapping to and from tile entity like tiles
+        // This is because they require clean up and set up that simple swapping can't handle
+        public static bool IsInvalidTileEntityLikeTile(int heldTile, int heldStyle, int x, int y)
         {
             Tile tileToReplace = Framing.GetTileSafely(x, y);
             TileObjectData replaceData = TileObjectData.GetTileData(tileToReplace);
+            TileObjectData heldData = TileObjectData.GetTileData(heldTile, heldStyle);
             Point16 potentialTileEntityPos = new Point16(x, y);
+
+            // Holding a tile entity tile
+            if (heldData != null && heldData.HookPostPlaceMyPlayer.hook != null)
+            {
+                return true;
+            }
 
             if(replaceData != null)
             {
@@ -93,7 +100,9 @@ namespace MoreBlockSwap
             {
                 TileID.DemonAltar => true,
                 TileID.GemLocks => tileToReplace.TileFrameY >= 54, // prevents swappping gem locks when full to prevent networking issues
-                var x when TileID.Sets.BreakableWhenPlacing[x] => true,
+                TileID.Boulder => true, // forces you to break them and deal with consequences :)
+                var x when TileID.Sets.BreakableWhenPlacing[x] => true, // These tiles are supposed to break so replacement is effectively already achieved
+                var x when Main.tileCut[x] => true, // These tiles break when swinging so same as above
                 _ => false,
             };
         }

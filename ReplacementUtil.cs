@@ -57,6 +57,7 @@ namespace MoreBlockSwap
         public static void MultiTileSwap(ushort targetType, int targetStyle, int topLeftX, int topLeftY)
         {
             Tile topLeftTile = Main.tile[topLeftX, topLeftY];
+            int oldType = topLeftTile.TileType;
             TileObjectData heldData = TileObjectData.GetTileData(targetType, targetStyle);
             TileObjectData replaceData = TileObjectData.GetTileData(topLeftTile);
             Point newTopLeftFrame = DetermineNewTileStart(targetType, targetStyle, topLeftX, topLeftY, out TileObject placeData);
@@ -82,11 +83,15 @@ namespace MoreBlockSwap
                 newFrameX += heldData.CoordinateWidth + heldData.CoordinatePadding;
             }
 
+            /* This almost works, multiplayer has issues, just means that you can't place a tile entity tile with block swap
             if(placeData.type != 0 && heldData.HookPostPlaceMyPlayer.hook != null) 
             {
                 // Very important for tile entities
-                heldData.HookPostPlaceMyPlayer.hook(topLeftX + heldData.Origin.X, topLeftY + heldData.Origin.Y, placeData.type, placeData.style, 0, placeData.alternate);
+                TileObjectData.CallPostPlacementPlayerHook(topLeftX + heldData.Origin.X, topLeftY + heldData.Origin.Y, placeData.type, placeData.style, 1, placeData.alternate, placeData);
             }
+            */
+
+            PostSwapCleanUp(oldType, topLeftTile.TileType, topLeftX, topLeftY);
 
             for (int i = 0; i < replaceData.Width; ++i)
             {
@@ -94,6 +99,14 @@ namespace MoreBlockSwap
                 {
                     WorldGen.SquareTileFrame(topLeftX + i, topLeftY + j);
                 }
+            }
+        }
+
+        public static void PostSwapCleanUp(int oldTileType, int newTileType, int topLeftX, int topLeftY)
+        {
+            if (Main.tileSign[oldTileType] && !Main.tileSign[newTileType])
+            {
+                Sign.KillSign(topLeftX, topLeftY);
             }
         }
 
