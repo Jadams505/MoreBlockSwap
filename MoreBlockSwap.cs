@@ -1,14 +1,11 @@
-using System;
-using System.Collections.Generic;
-using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ObjectData;
 
 namespace MoreBlockSwap
 {
     public class MoreBlockSwap : Mod
     {
+        public static MoreBlockSwap Instance => ModContent.GetInstance<MoreBlockSwap>();
+
         public override void Load()
         {
             On.Terraria.WorldGen.WouldTileReplacementWork += BlockSwapHooks.WorldGen_WouldTileReplacementWork;

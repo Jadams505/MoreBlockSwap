@@ -106,6 +106,7 @@ namespace MoreBlockSwap
                 TileID.GemLocks => tileToReplace.TileFrameY >= 54, // prevents swappping gem locks when full to prevent networking issues
                 TileID.Boulder => true, // forces you to break them and deal with consequences :)
                 TileID.ChristmasTree => true, // Does strange things with its framing to account for christmas lights
+                TileID.ClosedDoor => WorldGen.IsLockedDoor(tileToReplace), // stop swapping with locked temple door
                 var type when TileID.Sets.BreakableWhenPlacing[type] || Main.tileCut[type] => true, // These tiles are supposed to break so replacement is effectively already achieved
                 _ => false,
             };

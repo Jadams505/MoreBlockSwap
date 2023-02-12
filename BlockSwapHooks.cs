@@ -30,16 +30,34 @@ namespace MoreBlockSwap
             return orig(x, y, targetType, targetStyle);
         }
 
+        // Called only on the client
         internal static bool Player_PlaceThing_ValidTileForReplacement(On.Terraria.Player.orig_PlaceThing_ValidTileForReplacement orig, Player self)
         {
             bool vanillaCall = orig(self);
             return vanillaCall || IsTileValidForMoreBlockSwapReplacement(self.HeldItem.createTile, self.HeldItem.placeStyle, Player.tileTargetX, Player.tileTargetY);
         }
 
+        // Called on the client when used in PlaceThing_ValidTileForReplacement
+        // Called on the client and server when used in ReplaceTile
+        // In the ReplaceTile case it only gets called on the server if true on the client
         internal static bool WorldGen_WouldTileReplacementWork(On.Terraria.WorldGen.orig_WouldTileReplacementWork orig, ushort attemptingToReplaceWith, int x, int y)
         {
             bool vanillaCall = orig(attemptingToReplaceWith, x, y);
-            return vanillaCall || IsTileValidForMoreBlockSwapReplacement(attemptingToReplaceWith, Main.LocalPlayer.HeldItem.placeStyle, x, y);
+            if (vanillaCall)
+            {
+                return true;
+            }
+
+            // This was already true on the client so it is assumed true on the server
+            // It's risky but seems to work
+            // The alternative is a full rewrite of ReplaceTile because for some stubborn reason it doesn't pass targetType and targetStyle to its method calls
+            if (Main.dedServ)
+            {
+                return true; 
+            }
+
+            // Check made by the client so Main.LocalPlayer can be used
+            return IsTileValidForMoreBlockSwapReplacement(attemptingToReplaceWith, Main.LocalPlayer.HeldItem.placeStyle, x, y);
         }
 
         private static bool IsTileValidForMoreBlockSwapReplacement(int heldTile, int placeStyle, int targetX, int targetY)
