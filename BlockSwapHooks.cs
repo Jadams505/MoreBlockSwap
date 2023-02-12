@@ -29,14 +29,19 @@ namespace MoreBlockSwap
                 return false;
             }
 
-            if (BlockSwapUtil.IsConversionCase(tileToReplace.TileType, heldTile, out _, out _))
+            if (SwapValidityUtil.IsInvalidBlockedByPlayers(targetX, targetY, heldTile, placeStyle))
             {
-                return true;
+                return false;
             }
 
             if (SwapValidityUtil.IsInvalidTileEntityLikeTile(heldTile, placeStyle, targetX, targetY))
             {
                 return false;
+            }
+
+            if (BlockSwapUtil.IsConversionCase(tileToReplace.TileType, heldTile, out _, out _))
+            {
+                return true;
             }
 
             if (data == null)
@@ -54,16 +59,7 @@ namespace MoreBlockSwap
                 return true;
             }
 
-            if (heldTile == tileToReplace.TileType && heldTile < TileID.Count)
-            {
-                int tileToReplaceItemPlaceStyle = BlockSwapUtil.GetItemPlaceStyleFromTile(tileToReplace);
-                if (data.RandomStyleRange > 0)
-                {
-                    return placeStyle == tileToReplaceItemPlaceStyle; // allows for replacement into a different random style
-                }
-                return placeStyle != tileToReplaceItemPlaceStyle;
-            }
-            return false;
+            return SwapValidityUtil.IsValidForSameTypeReplacement(heldTile, placeStyle, tileToReplace);
         }
 
         internal static void WorldGen_MoveReplaceTileAnchor(On.Terraria.WorldGen.orig_MoveReplaceTileAnchor orig, ref int x, ref int y, ushort targetType, Tile t)
