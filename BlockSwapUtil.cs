@@ -128,37 +128,6 @@ namespace MoreBlockSwap
             };
         }
 
-        public static int GetItemDrop(int targetTileId, int targetStyle)
-        {
-            int customDrop = GetCustomDrop(targetTileId, targetStyle);
-            if(customDrop != -1)
-            {
-                return customDrop;
-            }
-
-            for (int i = 0; i < ItemID.Count; ++i)
-            {
-                Item item = new Item();
-                item.SetDefaults(i);
-                if (item.createTile == targetTileId && item.placeStyle == targetStyle)
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-        public static int GetCustomDrop(int targetTileId, int targetStyle)
-        {
-            return targetTileId switch
-            {
-                TileID.Sandcastles => ItemID.SandBlock,
-                TileID.TrapdoorOpen => ItemID.Trapdoor,
-                TileID.TallGateOpen => ItemID.TallGate,
-                _ => -1,
-            };
-        }
-
         public static bool ShouldVanillaHandleSwap(int targetType, Tile tileToReplace)
         {
             TileObjectData toReplaceData = TileObjectData.GetTileData(tileToReplace);

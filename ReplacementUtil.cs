@@ -8,9 +8,8 @@ namespace MoreBlockSwap
 {
     public static class ReplacementUtil
     {
-        public static void SingleTileSwap(ushort targetType, int targetStyle, int topLeftX, int topLeftY)
+        public static void SingleTileSwap(ushort targetType, int targetStyle, int topLeftX, int topLeftY, Tile replaceTile)
         {
-            Tile replaceTile = Framing.GetTileSafely(topLeftX, topLeftY);
             CustomEliminateNaturalExtras(topLeftX, topLeftY, replaceTile.TileType, targetType);
 
             replaceTile.TileType = targetType;

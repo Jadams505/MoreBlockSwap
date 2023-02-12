@@ -16,6 +16,7 @@ namespace MoreBlockSwap
             On.Terraria.WorldGen.KillTile_GetItemDrops += BlockSwapHooks.WorldGen_KillTile_GetItemDrops;
             On.Terraria.WorldGen.ReplaceTIle_DoActualReplacement += BlockSwapHooks.WorldGen_ReplaceTIle_DoActualReplacement;
             On.Terraria.Player.PlaceThing_ValidTileForReplacement += BlockSwapHooks.Player_PlaceThing_ValidTileForReplacement;
+            On.Terraria.WorldGen.ReplaceTile += BlockSwapHooks.WorldGen_ReplaceTile;
         }
 
         public override void Unload()
@@ -25,6 +26,7 @@ namespace MoreBlockSwap
             On.Terraria.WorldGen.KillTile_GetItemDrops -= BlockSwapHooks.WorldGen_KillTile_GetItemDrops;
             On.Terraria.WorldGen.ReplaceTIle_DoActualReplacement -= BlockSwapHooks.WorldGen_ReplaceTIle_DoActualReplacement;
             On.Terraria.Player.PlaceThing_ValidTileForReplacement -= BlockSwapHooks.Player_PlaceThing_ValidTileForReplacement;
+            On.Terraria.WorldGen.ReplaceTile -= BlockSwapHooks.WorldGen_ReplaceTile;
         }
     }
 }

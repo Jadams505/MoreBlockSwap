@@ -7,6 +7,29 @@ namespace MoreBlockSwap
 {
     public static class BlockSwapHooks
     {
+        internal static bool WorldGen_ReplaceTile(On.Terraria.WorldGen.orig_ReplaceTile orig, int x, int y, ushort targetType, int targetStyle)
+        {
+            Tile replaceTile = Framing.GetTileSafely(x, y);
+
+            // Conversion tiles use targetType which is not passed to all methods called in orig
+            // This basically re-writes the original method to include access to targetType
+            if(BlockSwapUtil.IsConversionCase(replaceTile.TileType, targetType, out int typeOverride, out _))
+            {
+                int num = WorldGen.KillTile_GetTileDustAmount(fail: false, replaceTile, x, y);
+                for (int i = 0; i < num; i++)
+                {
+                    WorldGen.KillTile_MakeTileDust(x, y, replaceTile);
+                }
+
+                WorldGen.KillTile_PlaySounds(x, y, fail: false, replaceTile);
+                ItemDropUtil.DropItems(x, y, replaceTile, targetType, includeLargeObjectDrops: true);
+                ReplacementUtil.SingleTileSwap((ushort)typeOverride, targetStyle, x, y, replaceTile);
+
+                return true;
+            }
+            return orig(x, y, targetType, targetStyle);
+        }
+
         internal static bool Player_PlaceThing_ValidTileForReplacement(On.Terraria.Player.orig_PlaceThing_ValidTileForReplacement orig, Player self)
         {
             bool vanillaCall = orig(self);
@@ -82,14 +105,6 @@ namespace MoreBlockSwap
             {
                 int targetTileId = tileCache.TileType;
                 TileObjectData data = TileObjectData.GetTileData(tileCache);
-                Player playerToGiveDropsTo = Main.player[Player.FindClosest(new Vector2(x, y) * 16f, 16, 16)]; // Can't use Main.LocalPlayer because this is called on the server
-                int heldTile = playerToGiveDropsTo.HeldItem.createTile; // vanilla does this too so that means it works, right?
-
-                if (BlockSwapUtil.IsConversionCase(targetTileId, heldTile, out _, out int dropOverride))
-                {
-                    dropItem = dropOverride;
-                    return;
-                }
 
                 if (dropItem > 0)
                 {
@@ -104,7 +119,7 @@ namespace MoreBlockSwap
                     }
 
                     int style = BlockSwapUtil.GetItemPlaceStyleFromTile(tileCache);
-                    int drop = BlockSwapUtil.GetItemDrop(targetTileId, style);
+                    int drop = ItemDropUtil.GetItemDrop(targetTileId, style);
                     if (drop != -1)
                     {
                         dropItem = drop;
@@ -117,12 +132,6 @@ namespace MoreBlockSwap
         {
             if (BlockSwapUtil.ShouldVanillaHandleSwap(targetType, t))
             {
-                if(BlockSwapUtil.IsConversionCase(t.TileType, targetType, out int typeOverride, out _))
-                {
-                    targetType = (ushort)typeOverride;
-                    ReplacementUtil.SingleTileSwap(targetType, targetStyle, topLeftX, topLeftY);
-                    return;
-                }
                 orig(targetType, targetStyle, topLeftX, topLeftY, t);
                 return;
             }
