@@ -1,5 +1,11 @@
 Allows for more tiles to be block swapped with each other
 
+General Rules For Swapping:
+- Tiles must either be the same type or the same size
+- Tiles that place tile entities can not be swapped to or from this includes tiles like: chests, item frames, plates, etc
+- Cannot swap a non solid tile to a solid tile if a player is in the way
+- The player must have enough pick power to mine the block
+
 Examples:
 - Bookcases
 - Beds
@@ -8,6 +14,11 @@ Examples:
 - Clocks
 - Tombstones
 - Relics
+- Grasses
+- Moss
+- Signs
+- Cages
+- Doors (open and closed)
 - And Many More
 
 Currently only works with vanilla tiles.

@@ -1,2 +1,9 @@
 ﻿
-Fixed potential divide by zero errors
+Enabled the ability to swap between unrelated tile types as long as they are the same size
+Enabled conversion swapping (grass and moss)
+
+Notable Additions:
+Grasses
+Moss
+Signs
+Cages
