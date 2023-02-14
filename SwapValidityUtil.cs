@@ -44,6 +44,67 @@ namespace MoreBlockSwap
             return false;
         }
 
+        public static bool IsLivingFire(int tileId) => tileId switch
+        {
+            TileID.LivingFire => true,
+            TileID.LivingCursedFire => true,
+            TileID.LivingDemonFire => true,
+            TileID.LivingFrostFire => true,
+            TileID.LivingIchor => true,
+            TileID.LivingUltrabrightFire => true,
+            TileID.ChimneySmoke => true,
+            _ => false
+        };
+
+        public static bool IsValidForStandardReplacement(int type)
+        {
+            if (Main.tileSolid[type] && !Main.tileSolidTop[type])
+            {
+                if (!Main.tileRope[type])
+                    return !Main.tileFrameImportant[type];
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public static bool IsValidFramedTileCase(int heldTile, int heldStyle, Tile tileToReplace)
+        {
+            int replaceTile = tileToReplace.TileType;
+
+            if (heldTile == TileID.PlanterBox && tileToReplace.TileType == TileID.PlanterBox && heldStyle != tileToReplace.TileFrameY / 18)
+            {
+                return true;
+            }
+
+            if (heldTile != replaceTile)
+            {
+                if (TileID.Sets.IsBeam[heldTile] && TileID.Sets.IsBeam[replaceTile])
+                {
+                    return true;
+                }
+
+                if(IsLivingFire(heldTile) && IsLivingFire(replaceTile))
+                {
+                    return true;
+                }
+
+                if (Main.tileRope[heldTile] && Main.tileRope[replaceTile])
+                {
+                    return true;
+                }
+
+                if ((replaceTile == TileID.PlanterBox && (IsValidForStandardReplacement(heldTile) || TileID.Sets.Platforms[heldTile])) ||
+                (heldTile == TileID.PlanterBox && (IsValidForStandardReplacement(replaceTile) || TileID.Sets.Platforms[replaceTile])))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static bool IsValidForCrossTypeReplacement(int heldTileId, int heldPlaceStyle, int targetX, int targetY, Tile tileToReplace)
         {
             TileObjectData heldData = TileObjectData.GetTileData(heldTileId, heldPlaceStyle);
@@ -108,6 +169,7 @@ namespace MoreBlockSwap
                 TileID.ChristmasTree => true, // Does strange things with its framing to account for christmas lights
                 TileID.ClosedDoor => WorldGen.IsLockedDoor(tileToReplace), // stop swapping with locked temple door
                 var type when TileID.Sets.BreakableWhenPlacing[type] || Main.tileCut[type] => true, // These tiles are supposed to break so replacement is effectively already achieved
+                var type when TileID.Sets.DoesntGetReplacedWithTileReplacement[type] => true, // Vanilla prevents against these. Future Consideration: Swapping with magic ice might be useful
                 _ => false,
             };
         }

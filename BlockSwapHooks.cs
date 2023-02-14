@@ -10,23 +10,20 @@ namespace MoreBlockSwap
         internal static bool WorldGen_ReplaceTile(On.Terraria.WorldGen.orig_ReplaceTile orig, int x, int y, ushort targetType, int targetStyle)
         {
             Tile replaceTile = Framing.GetTileSafely(x, y);
+            ushort heldTile = targetType;
 
-            // Conversion tiles use targetType which is not passed to all methods called in orig
-            // This basically re-writes the original method to include access to targetType
-            if(BlockSwapUtil.IsConversionCase(replaceTile.TileType, targetType, out int typeOverride, out _))
+            if (BlockSwapUtil.IsConversionCase(replaceTile.TileType, targetType, out int typeOverride, out _))
             {
-                int num = WorldGen.KillTile_GetTileDustAmount(fail: false, replaceTile, x, y);
-                for (int i = 0; i < num; i++)
-                {
-                    WorldGen.KillTile_MakeTileDust(x, y, replaceTile);
-                }
-
-                WorldGen.KillTile_PlaySounds(x, y, fail: false, replaceTile);
-                ItemDropUtil.DropItems(x, y, replaceTile, targetType, includeLargeObjectDrops: true);
-                ReplacementUtil.SingleTileSwap((ushort)typeOverride, targetStyle, x, y, replaceTile);
-
+                ReplacementUtil.ReplaceSingleTile(x, y, (ushort)typeOverride, targetStyle);
                 return true;
             }
+
+            if (SwapValidityUtil.IsValidFramedTileCase(heldTile, targetType, replaceTile))
+            {
+                ReplacementUtil.ReplaceSingleTile( x, y, targetType, targetStyle);
+                return true;
+            }
+
             return orig(x, y, targetType, targetStyle);
         }
 
@@ -78,6 +75,11 @@ namespace MoreBlockSwap
             if (SwapValidityUtil.IsInvalidTileEntityLikeTile(heldTile, placeStyle, targetX, targetY))
             {
                 return false;
+            }
+
+            if(SwapValidityUtil.IsValidFramedTileCase(heldTile, placeStyle, tileToReplace))
+            {
+                return true;
             }
 
             if (BlockSwapUtil.IsConversionCase(tileToReplace.TileType, heldTile, out _, out _))

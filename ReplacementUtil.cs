@@ -8,12 +8,35 @@ namespace MoreBlockSwap
 {
     public static class ReplacementUtil
     {
+        // This is a copy of WorldGen.ReplaceTile
+        // But makes sure to pass targetType and targetStyle to more methods
+        public static void ReplaceSingleTile(int x, int y, ushort targetType, int targetStyle)
+        {
+            Tile replaceTile = Framing.GetTileSafely(x, y);
+
+            int dustCount = WorldGen.KillTile_GetTileDustAmount(fail: false, replaceTile, x, y);
+            for (int i = 0; i < dustCount; i++)
+            {
+                WorldGen.KillTile_MakeTileDust(x, y, replaceTile);
+            }
+
+            WorldGen.KillTile_PlaySounds(x, y, fail: false, replaceTile);
+            ItemDropUtil.DropItems(x, y, replaceTile, targetType, includeLargeObjectDrops: true);
+            SingleTileSwap(targetType, targetStyle, x, y, replaceTile);
+        }
+
         public static void SingleTileSwap(ushort targetType, int targetStyle, int topLeftX, int topLeftY, Tile replaceTile)
         {
             CustomEliminateNaturalExtras(topLeftX, topLeftY, replaceTile.TileType, targetType);
+            int oldType = replaceTile.TileType;
 
             replaceTile.TileType = targetType;
             replaceTile.Clear(TileDataType.TilePaint);
+
+            if (targetType == TileID.PlanterBox || TileID.Sets.Platforms[targetType])
+            {
+                replaceTile.TileFrameY = (short)(targetStyle * 18);
+            }
 
             if (!WorldGen.CanPoundTile(topLeftX, topLeftY))
             {
