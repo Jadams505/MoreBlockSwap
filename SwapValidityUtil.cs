@@ -44,24 +44,14 @@ namespace MoreBlockSwap
             return false;
         }
 
-        public static bool IsLivingFire(int tileId) => tileId switch
-        {
-            TileID.LivingFire => true,
-            TileID.LivingCursedFire => true,
-            TileID.LivingDemonFire => true,
-            TileID.LivingFrostFire => true,
-            TileID.LivingIchor => true,
-            TileID.LivingUltrabrightFire => true,
-            TileID.ChimneySmoke => true,
-            _ => false
-        };
-
         public static bool IsValidForStandardReplacement(int type)
         {
             if (Main.tileSolid[type] && !Main.tileSolidTop[type])
             {
                 if (!Main.tileRope[type])
+                {
                     return !Main.tileFrameImportant[type];
+                }
 
                 return true;
             }
@@ -80,26 +70,15 @@ namespace MoreBlockSwap
 
             if (heldTile != replaceTile)
             {
-                if (TileID.Sets.IsBeam[heldTile] && TileID.Sets.IsBeam[replaceTile])
+                // Treat planter boxes like platforms
+                if ((heldTile == TileID.PlanterBox && (IsValidForStandardReplacement(replaceTile) || replaceTile == TileID.Platforms)) || 
+                    (replaceTile == TileID.PlanterBox && (IsValidForStandardReplacement(heldTile) || heldTile == TileID.Platforms)))
                 {
                     return true;
                 }
 
-                if(IsLivingFire(heldTile) && IsLivingFire(replaceTile))
-                {
-                    return true;
-                }
-
-                if (Main.tileRope[heldTile] && Main.tileRope[replaceTile])
-                {
-                    return true;
-                }
-
-                if ((replaceTile == TileID.PlanterBox && (IsValidForStandardReplacement(heldTile) || TileID.Sets.Platforms[heldTile])) ||
-                (heldTile == TileID.PlanterBox && (IsValidForStandardReplacement(replaceTile) || TileID.Sets.Platforms[replaceTile])))
-                {
-                    return true;
-                }
+                // Non solid tiles can swap with other non solid tiles
+                return !Main.tileSolid[heldTile] && !Main.tileFrameImportant[heldTile] && !Main.tileSolid[replaceTile] && !Main.tileFrameImportant[replaceTile];
             }
 
             return false;
@@ -168,6 +147,7 @@ namespace MoreBlockSwap
                 TileID.Boulder => true, // forces you to break them and deal with consequences :)
                 TileID.ChristmasTree => true, // Does strange things with its framing to account for christmas lights
                 TileID.ClosedDoor => WorldGen.IsLockedDoor(tileToReplace), // stop swapping with locked temple door
+                TileID.Cactus => true, // For some reason cactus is not in Main.tileFrameImportant
                 var type when TileID.Sets.BreakableWhenPlacing[type] || Main.tileCut[type] => true, // These tiles are supposed to break so replacement is effectively already achieved
                 var type when TileID.Sets.DoesntGetReplacedWithTileReplacement[type] => true, // Vanilla prevents against these. Future Consideration: Swapping with magic ice might be useful
                 _ => false,

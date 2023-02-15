@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿/*
+using Terraria;
+using System.Collections.Generic;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
@@ -10,6 +12,12 @@ namespace MoreBlockSwap
         public static BlockSwapSystem Instance => ModContent.GetInstance<BlockSwapSystem>();
 
         public static Dictionary<(int width, int height), List<int>> TileObjectPairs = new();
+
+        public static List<int> NonSolidTiles = new();
+
+        public static List<int> SolidTopTiles = new();
+
+        public static List<int> NotFrameImportantButHaveTOD = new();
 
         public override void PostAddRecipes()
         {
@@ -28,8 +36,24 @@ namespace MoreBlockSwap
                     {
                         TileObjectPairs.Add(key, new List<int> { i });
                     }
+
+                    if (!Main.tileFrameImportant[i])
+                    {
+                        NotFrameImportantButHaveTOD.Add(i);
+                    }
+                }
+
+                if (!Main.tileSolid[i] && !Main.tileFrameImportant[i])
+                {
+                    NonSolidTiles.Add(i);
+                }
+
+                if (Main.tileSolidTop[i] && !Main.tileFrameImportant[i])
+                {
+                    SolidTopTiles.Add(i);
                 }
             }
         }
     }
 }
+*/
