@@ -17,7 +17,13 @@ namespace MoreBlockSwap
 
         public static List<int> SolidTopTiles = new();
 
-        public static List<int> NotFrameImportantButHaveTOD = new();
+        public static List<int> FrameImportantTOD = new();
+
+        public static List<int> FrameImportantNoTOD = new();
+
+        public static List<int> FramedTOD = new();
+
+        public static List<int> FramedNoTOD = new();
 
         public override void PostAddRecipes()
         {
@@ -37,9 +43,25 @@ namespace MoreBlockSwap
                         TileObjectPairs.Add(key, new List<int> { i });
                     }
 
-                    if (!Main.tileFrameImportant[i])
+                    if (Main.tileFrameImportant[i])
                     {
-                        NotFrameImportantButHaveTOD.Add(i);
+                        FrameImportantTOD.Add(i);
+                    }
+                    else
+                    {
+                        FramedTOD.Add(i);
+                    }
+
+                }
+                else
+                {
+                    if (Main.tileFrameImportant[i])
+                    {
+                        FrameImportantNoTOD.Add(i);
+                    }
+                    else
+                    {
+                        FramedNoTOD.Add(i);
                     }
                 }
 
