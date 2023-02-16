@@ -11,7 +11,7 @@ namespace MoreBlockSwap
     {
         public static bool IsValidForSameTypeReplacement(int heldTile, int heldStyle, Tile tileToReplace)
         {
-            if (heldTile == tileToReplace.TileType && heldTile < TileID.Count)
+            if (heldTile == tileToReplace.TileType)
             {
                 TileObjectData replaceData = TileObjectData.GetTileData(tileToReplace);
                 int tileToReplaceItemPlaceStyle = BlockSwapUtil.GetItemPlaceStyleFromTile(tileToReplace);
@@ -25,20 +25,13 @@ namespace MoreBlockSwap
             return false;
         }
 
-        public static bool IsValidForReplacementCustom(int heldTileId, int heldPlaceStyle, Tile tileToReplace)
+        public static bool IsValidForOpenDoorReplacement(int closedDoor, int closedDoorStyle, Tile openDoor)
         {
-            int tileToReplacePlaceStyle = BlockSwapUtil.GetItemPlaceStyleFromTile(tileToReplace);
-            int closeDoorId = TileLoader.CloseDoorID(tileToReplace);
+            int openDoorStyle = BlockSwapUtil.GetItemPlaceStyleFromTile(openDoor);
 
-            if (closeDoorId != -1)
+            if (BlockSwapUtil.IsOpenDoor(openDoor.TileType) && BlockSwapUtil.IsClosedDoor(closedDoor))
             {
-                if (heldTileId == closeDoorId)
-                {
-                    if (tileToReplacePlaceStyle != -1)
-                    {
-                        return heldPlaceStyle != tileToReplacePlaceStyle;
-                    }
-                }
+                return TileLoader.CloseDoorID(openDoor) != closedDoor || closedDoorStyle != openDoorStyle;
             }
 
             return false;

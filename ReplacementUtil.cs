@@ -185,7 +185,7 @@ namespace MoreBlockSwap
 
         private static Point? GetCustomTileStart(ushort targetType, int targetStyle, Tile topLeftTile)
         {
-            if (targetType == TileID.OpenDoor && topLeftTile.TileType == TileID.OpenDoor)
+            if (BlockSwapUtil.IsOpenDoor(topLeftTile.TileType) && BlockSwapUtil.IsOpenDoor(targetType))
             {
                 if (BlockSwapUtil.GetPlaceStyleForDoor(topLeftTile, out int doorStyle))
                 {

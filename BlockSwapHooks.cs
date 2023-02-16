@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.ID;
 using Terraria.ObjectData;
 
 namespace MoreBlockSwap
@@ -25,6 +24,17 @@ namespace MoreBlockSwap
             }
 
             return orig(x, y, targetType, targetStyle);
+        }
+
+        internal static void WorldGen_KillTile_DropItems(On.Terraria.WorldGen.orig_KillTile_DropItems orig, int x, int y, Tile tileCache, bool includeLargeObjectDrops)
+        {
+            // Only the case when swapping
+            if (includeLargeObjectDrops)
+            {
+                ItemDropUtil.DropItems(x, y, tileCache, null, includeLargeObjectDrops);
+                return;
+            }
+            orig(x, y, tileCache, includeLargeObjectDrops);
         }
 
         // Called only on the client
@@ -97,7 +107,7 @@ namespace MoreBlockSwap
                 return true;
             }
 
-            if (SwapValidityUtil.IsValidForReplacementCustom(heldTile, placeStyle, tileToReplace))
+            if (SwapValidityUtil.IsValidForOpenDoorReplacement(heldTile, placeStyle, tileToReplace))
             {
                 return true;
             }
@@ -133,9 +143,9 @@ namespace MoreBlockSwap
 
                 if (data != null)
                 {
-                    if(targetTileId == TileID.OpenDoor)
+                    if (BlockSwapUtil.IsOpenDoor(targetTileId))
                     {
-                        targetTileId = TileID.ClosedDoor;
+                        targetTileId = BlockSwapUtil.ClosedDoorId(targetTileId);
                     }
 
                     int style = BlockSwapUtil.GetItemPlaceStyleFromTile(tileCache);
@@ -156,9 +166,13 @@ namespace MoreBlockSwap
                 return;
             }
 
-            if (t.TileType == TileID.OpenDoor && targetType == TileID.ClosedDoor)
+            if(SwapValidityUtil.IsValidForOpenDoorReplacement(targetType, targetStyle, t))
             {
-                targetType = TileID.OpenDoor;
+                int openDoor = BlockSwapUtil.OpenDoorId(closedDoor: targetType);
+                if(openDoor != -1)
+                {
+                    targetType = (ushort)openDoor;
+                }
             }
 
             ReplacementUtil.MultiTileSwap(targetType, targetStyle, topLeftX, topLeftY);

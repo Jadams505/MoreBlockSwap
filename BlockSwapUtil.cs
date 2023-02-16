@@ -63,11 +63,10 @@ namespace MoreBlockSwap
         public static bool GetPlaceStyleForDoor(Tile tile, out int style)
         {
             TileObjectData data = TileObjectData.GetTileData(tile);
-            ModTile mTile = TileLoader.GetTile(tile.TileType);
             int frameX = tile.TileFrameX;
             int frameY = tile.TileFrameY;
 
-            if ((mTile != null && mTile.OpenDoorID != -1) || tile.TileType == TileID.ClosedDoor)
+            if (IsClosedDoor(tile.TileType))
             {
                 int row = frameY.SafeDivide(data.CoordinateFullHeight);
                 int col = frameX.SafeDivide(data.CoordinateFullWidth * 3);
@@ -75,7 +74,7 @@ namespace MoreBlockSwap
                 style =  row + col * data.StyleWrapLimit;
                 return true;
             }
-            else if ((mTile != null && mTile.CloseDoorID != -1) || tile.TileType == TileID.OpenDoor)
+            else if (IsOpenDoor(tile.TileType))
             {
                 int row = frameY.SafeDivide(data.CoordinateFullHeight);
                 int col = frameX.SafeDivide(data.CoordinateFullWidth * 2);
@@ -239,6 +238,42 @@ namespace MoreBlockSwap
                 _ => -1,
             };
         }
+
+        public static int OpenDoorId(int closedDoor)
+        {
+            ModTile mClosedDoor = TileLoader.GetTile(closedDoor);
+            if (mClosedDoor != null && mClosedDoor.OpenDoorID > -1)
+            {
+                return mClosedDoor.OpenDoorID;
+            }
+            
+            if(closedDoor == TileID.ClosedDoor)
+            {
+                return TileID.OpenDoor;
+            }
+
+            return -1;
+        }
+
+        public static int ClosedDoorId(int openDoor)
+        {
+            ModTile mOpenDoor = TileLoader.GetTile(openDoor);
+            if (mOpenDoor != null && mOpenDoor.CloseDoorID > -1)
+            {
+                return mOpenDoor.CloseDoorID;
+            }
+
+            if(openDoor == TileID.OpenDoor)
+            {
+                return TileID.ClosedDoor;
+            }
+
+            return -1;
+        }
+
+        public static bool IsOpenDoor(int openDoor) => ClosedDoorId(openDoor) != -1;
+
+        public static bool IsClosedDoor(int closedDoor) => OpenDoorId(closedDoor) != -1;
 
         public static Point TopLeftOfMultiTile(int tilePosX, int tilePosY, Tile tile)
         {

@@ -8,16 +8,17 @@ namespace MoreBlockSwap
     {
         // This is a copy of WorldGen.KillTile_DropItems
         // heldTile was added because some drops are based off it
-        public static void DropItems(int x, int y, Tile tileCache, int heldTile, bool includeLargeObjectDrops = false)
+        // This also removes the TileLoader.Drop call to allow modded swapping to drop items
+        public static void DropItems(int x, int y, Tile tileCache, int? heldTile = null, bool includeLargeObjectDrops = false)
         {
-            if (!TileLoader.Drop(x, y, Main.tile[x, y].TileType))
-                return;
-
             WorldGen.KillTile_GetItemDrops(x, y, tileCache, out var dropItem, out var dropItemStack, out var secondaryItem, out var secondaryItemStack, includeLargeObjectDrops);
 
-            if (includeLargeObjectDrops && BlockSwapUtil.IsConversionCase(tileCache.TileType, heldTile, out _, out int dropOverride))
+            if(heldTile is int targetTile)
             {
-                dropItem = dropOverride;
+                if (includeLargeObjectDrops && BlockSwapUtil.IsConversionCase(tileCache.TileType, targetTile, out _, out int dropOverride))
+                {
+                    dropItem = dropOverride;
+                }
             }
 
             if (!Main.getGoodWorld || tileCache.HasTile)
@@ -44,6 +45,13 @@ namespace MoreBlockSwap
                 return customDrop;
             }
 
+            ModTile mTile = TileLoader.GetTile(targetTileId);
+
+            if(mTile != null && mTile.ItemDrop > 0)
+            {
+                return mTile.ItemDrop;
+            }
+
             for (int i = 0; i < ItemID.Count; ++i)
             {
                 Item item = new Item();
@@ -53,6 +61,19 @@ namespace MoreBlockSwap
                     return i;
                 }
             }
+
+            for(int i = ItemID.Count; i < ItemLoader.ItemCount; ++i)
+            {
+                ModItem mItem = ItemLoader.GetItem(i);
+                if(mItem != null)
+                {
+                    if(mItem.Item.createTile == targetTileId && mItem.Item.placeStyle == targetStyle)
+                    {
+                        return i;
+                    }
+                }
+            }
+
             return -1;
         }
 
