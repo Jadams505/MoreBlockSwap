@@ -1,9 +1,9 @@
 ﻿
-Enabled the ability to swap between unrelated tile types as long as they are the same size
-Enabled conversion swapping (grass and moss)
+Enabled the ability to swap to and from non-solid framed tiles
+Added support for planter boxes
 
 Notable Additions:
-Grasses
-Moss
-Signs
-Cages
+Beams
+Living Fire
+Planter Boxes
+Ropes

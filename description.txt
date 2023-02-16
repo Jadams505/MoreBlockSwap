@@ -7,9 +7,9 @@ General Rules For Swapping:
 - The player must have enough pick power to mine the block
 
 Examples:
-- Bookcases
-- Beds
-- Banners
+- Bookcases           - Planter Boxes
+- Beds                 - Beams
+- Banners             - Ropes
 - Paintings
 - Clocks
 - Tombstones
