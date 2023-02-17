@@ -1,4 +1,4 @@
-﻿Allows for more tiles to be block swapped with each other
+﻿Allows for more tiles to be block swapped with each other. Works for vanilla and modded tiles.
 
 [h1]General Rules For Swapping[/h1]
 [list]
@@ -24,7 +24,5 @@
 [*]Doors (open and closed)
 [*]And Many More
 [/list]
-
-Currently only works with vanilla tiles.
 
 Github: https://github.com/Jadams505/MoreBlockSwap

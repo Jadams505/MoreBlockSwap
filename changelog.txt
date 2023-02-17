@@ -1,9 +1,5 @@
 ﻿
-Enabled the ability to swap to and from non-solid framed tiles
-Added support for planter boxes
+Added modded tile support
 
 Notable Additions:
-Beams
-Living Fire
-Planter Boxes
-Ropes
+Modded Tiles

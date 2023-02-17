@@ -1,4 +1,4 @@
-Allows for more tiles to be block swapped with each other
+Allows for more tiles to be block swapped with each other. Works for vanilla and modded tiles.
 
 General Rules For Swapping:
 - Tiles must either be the same type or the same size
@@ -20,5 +20,3 @@ Examples:
 - Cages
 - Doors (open and closed)
 - And Many More
-
-Currently only works with vanilla tiles.
