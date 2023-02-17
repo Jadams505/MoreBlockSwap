@@ -31,6 +31,17 @@ namespace MoreBlockSwap
 
             if (BlockSwapUtil.IsOpenDoor(openDoor.TileType) && BlockSwapUtil.IsClosedDoor(closedDoor))
             {
+                TileObjectData closedDoorData = TileObjectData.GetTileData(closedDoor, closedDoorStyle);
+                TileObjectData openDoorData = TileObjectData.GetTileData(openDoor);
+
+                // Of course calamity adds a door that is not a 3x1
+                if (closedDoorData == null || openDoorData == null ||
+                    closedDoorData.Width != openDoorData.Width || 
+                    closedDoorData.Height != openDoorData.Height)
+                {
+                    return false;
+                }
+
                 return TileLoader.CloseDoorID(openDoor) != closedDoor || closedDoorStyle != openDoorStyle;
             }
 

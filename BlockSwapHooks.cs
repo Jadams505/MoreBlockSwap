@@ -134,26 +134,22 @@ namespace MoreBlockSwap
             if (includeLargeObjectDrops) // Only true when called in WorldGen.ReplaceTile
             {
                 int targetTileId = tileCache.TileType;
-                TileObjectData data = TileObjectData.GetTileData(tileCache);
 
                 if (dropItem > 0)
                 {
                     return;
                 }
 
-                if (data != null)
+                if (BlockSwapUtil.IsOpenDoor(targetTileId))
                 {
-                    if (BlockSwapUtil.IsOpenDoor(targetTileId))
-                    {
-                        targetTileId = BlockSwapUtil.ClosedDoorId(targetTileId);
-                    }
+                    targetTileId = BlockSwapUtil.ClosedDoorId(targetTileId);
+                }
 
-                    int style = BlockSwapUtil.GetItemPlaceStyleFromTile(tileCache);
-                    int drop = ItemDropUtil.GetItemDrop(targetTileId, style);
-                    if (drop != -1)
-                    {
-                        dropItem = drop;
-                    }
+                int style = BlockSwapUtil.GetItemPlaceStyleFromTile(tileCache);
+                int drop = ItemDropUtil.GetItemDrop(targetTileId, style);
+                if (drop != -1)
+                {
+                    dropItem = drop;
                 }
             }
         }

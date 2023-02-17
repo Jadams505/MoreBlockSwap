@@ -1,6 +1,7 @@
 ﻿using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ObjectData;
 
 namespace MoreBlockSwap
 {
@@ -12,6 +13,25 @@ namespace MoreBlockSwap
         public static void DropItems(int x, int y, Tile tileCache, int? heldTile = null, bool includeLargeObjectDrops = false)
         {
             WorldGen.KillTile_GetItemDrops(x, y, tileCache, out var dropItem, out var dropItemStack, out var secondaryItem, out var secondaryItemStack, includeLargeObjectDrops);
+            ModTile mTile = TileLoader.GetTile(tileCache.TileType);
+
+            // This is a last ditch effort to properly drop the tile
+            // Ideally this never happens but it happens with Thorium chandeliers and lanterns b/c they have a nonsensical styleWrapLimit of 111
+            if (dropItem == 0 && mTile != null)
+            {
+                TileObjectData data = TileObjectData.GetTileData(tileCache);
+
+                if(data != null)
+                {
+                    // I really don't want to call this, but it is the only way to "get" the drop of a multi-tile
+                    mTile.KillMultiTile(x, y, tileCache.TileFrameX, tileCache.TileFrameY);
+                }
+                else
+                {
+                    mTile.Drop(x, y);
+                }
+                return;
+            }
 
             if(heldTile is int targetTile)
             {
