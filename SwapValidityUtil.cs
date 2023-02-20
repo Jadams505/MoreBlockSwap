@@ -98,6 +98,12 @@ namespace MoreBlockSwap
             {
                 Point replaceTopLeft = BlockSwapUtil.TopLeftOfMultiTile(targetX, targetY, tileToReplace);
                 bool canPlace = TileObject.CanPlace(replaceTopLeft.X + heldData.Origin.X, replaceTopLeft.Y + heldData.Origin.Y, heldTileId, heldPlaceStyle, 0, out _, onlyCheck: false, checkStay: true);
+                
+                for (int i = 1; i < heldData.AlternatesCount && canPlace == false; ++i)
+                {
+                    TileObjectData altData = TileObjectData.GetTileData(heldTileId, heldPlaceStyle, i);
+                    canPlace = TileObject.CanPlace(replaceTopLeft.X + altData.Origin.X, replaceTopLeft.Y + altData.Origin.Y, heldTileId, heldPlaceStyle, 0, out _, onlyCheck: false, checkStay: true);
+                }
 
                 return canPlace;
             }
