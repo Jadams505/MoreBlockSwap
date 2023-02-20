@@ -31,18 +31,17 @@ namespace MoreBlockSwap
 
             if (BlockSwapUtil.IsOpenDoor(openDoor.TileType) && BlockSwapUtil.IsClosedDoor(closedDoor))
             {
-                TileObjectData closedDoorData = TileObjectData.GetTileData(closedDoor, closedDoorStyle);
-                TileObjectData openDoorData = TileObjectData.GetTileData(openDoor);
+                int replacementOpenDoorId = BlockSwapUtil.OpenDoorId(closedDoor);
+                TileObjectData replacemenOpenDoortData = TileObjectData.GetTileData(replacementOpenDoorId, 0);
+                TileObjectData currentOpenDoorData = TileObjectData.GetTileData(openDoor);
 
-                // Of course calamity adds a door that is not a 3x1
-                if (closedDoorData == null || openDoorData == null ||
-                    closedDoorData.Width != openDoorData.Width || 
-                    closedDoorData.Height != openDoorData.Height)
+                if (replacemenOpenDoortData == null || currentOpenDoorData == null ||
+                    replacemenOpenDoortData.Width != currentOpenDoorData.Width ||
+                    replacemenOpenDoortData.Height != currentOpenDoorData.Height)
                 {
                     return false;
                 }
-
-                return TileLoader.CloseDoorID(openDoor) != closedDoor || closedDoorStyle != openDoorStyle;
+                return replacementOpenDoorId != openDoor.TileType || closedDoorStyle != openDoorStyle;
             }
 
             return false;
@@ -154,6 +153,7 @@ namespace MoreBlockSwap
                 TileID.Cactus => true, // For some reason cactus is not in Main.tileFrameImportant
                 var type when TileID.Sets.BreakableWhenPlacing[type] || Main.tileCut[type] => true, // These tiles are supposed to break so replacement is effectively already achieved
                 var type when TileID.Sets.DoesntGetReplacedWithTileReplacement[type] => true, // Vanilla prevents against these. Future Consideration: Swapping with magic ice might be useful
+                var type when TileID.Sets.Torch[type] => true, // I am going to forget to remove this in 1.4.4
                 _ => false,
             };
         }
