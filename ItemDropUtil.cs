@@ -1,4 +1,5 @@
-﻿using Terraria;
+﻿using System.Reflection;
+using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
@@ -7,29 +8,29 @@ namespace MoreBlockSwap
 {
     public static class ItemDropUtil
     {
+        internal static MethodInfo WorldGen_KillTile_GetItemDrops;
+
         // This is a copy of WorldGen.KillTile_DropItems
         // heldTile was added because some drops are based off it
         // This also removes the TileLoader.Drop call to allow modded swapping to drop items
         public static void DropItems(int x, int y, Tile tileCache, int? heldTile = null, bool includeLargeObjectDrops = false)
         {
-            WorldGen.KillTile_GetItemDrops(x, y, tileCache, out var dropItem, out var dropItemStack, out var secondaryItem, out var secondaryItemStack, includeLargeObjectDrops);
+            WorldGen_KillTile_GetItemDrops ??= typeof(WorldGen).GetMethod("KillTile_GetItemDrops", BindingFlags.Static | BindingFlags.NonPublic);
+            var args = new object[] { x, y, tileCache, 0, 0, 0, 0, includeLargeObjectDrops };
+            
+            WorldGen_KillTile_GetItemDrops.Invoke(null, args);
+            
+            int dropItem = (int)args[3];
+            int dropItemStack = (int)args[4];
+            int secondaryItem = (int)args[5];
+            int secondaryItemStack = (int)args[6];
+
             ModTile mTile = TileLoader.GetTile(tileCache.TileType);
 
-            // This is a last ditch effort to properly drop the tile
-            // Ideally this never happens but it happens with Thorium chandeliers and lanterns b/c they have a nonsensical styleWrapLimit of 111
+            // Drop the items from modded tiles
             if (dropItem == 0 && mTile != null)
             {
-                TileObjectData data = TileObjectData.GetTileData(tileCache);
-
-                if(data != null)
-                {
-                    // I really don't want to call this, but it is the only way to "get" the drop of a multi-tile
-                    mTile.KillMultiTile(x, y, tileCache.TileFrameX, tileCache.TileFrameY);
-                }
-                else
-                {
-                    mTile.Drop(x, y);
-                }
+                TileLoader.Drop(x, y, mTile.Type, includeLargeObjectDrops); // Test this extensively
                 return;
             }
 

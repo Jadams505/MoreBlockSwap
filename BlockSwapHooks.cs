@@ -26,15 +26,15 @@ namespace MoreBlockSwap
             return orig(x, y, targetType, targetStyle);
         }
 
-        internal static void WorldGen_KillTile_DropItems(Terraria.On_WorldGen.orig_KillTile_DropItems orig, int x, int y, Tile tileCache, bool includeLargeObjectDrops)
+        internal static void WorldGen_KillTile_DropItems(Terraria.On_WorldGen.orig_KillTile_DropItems orig, int x, int y, Tile tileCache, bool includeLargeObjectDrops, bool includeAllModdedLargeObjectDrops)
         {
             // Only the case when swapping
-            if (includeLargeObjectDrops)
+            if (includeLargeObjectDrops) // || includeAllModdedLargeObjectDrops
             {
                 ItemDropUtil.DropItems(x, y, tileCache, null, includeLargeObjectDrops);
                 return;
             }
-            orig(x, y, tileCache, includeLargeObjectDrops);
+            orig(x, y, tileCache, includeLargeObjectDrops, includeAllModdedLargeObjectDrops);
         }
 
         // Called only on the client
@@ -71,6 +71,11 @@ namespace MoreBlockSwap
         {
             Tile tileToReplace = Main.tile[targetX, targetY];
             TileObjectData data = TileObjectData.GetTileData(tileToReplace);
+
+            if (!tileToReplace.HasTile)
+            {
+                return false;
+            }
 
             if (SwapValidityUtil.IsInvalidForReplacement(tileToReplace))
             {
