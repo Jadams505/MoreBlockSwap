@@ -8,24 +8,24 @@ namespace MoreBlockSwap
 
         public override void Load()
         {
-            On.Terraria.WorldGen.WouldTileReplacementWork += BlockSwapHooks.WorldGen_WouldTileReplacementWork;
-            On.Terraria.WorldGen.MoveReplaceTileAnchor += BlockSwapHooks.WorldGen_MoveReplaceTileAnchor;
-            On.Terraria.WorldGen.KillTile_GetItemDrops += BlockSwapHooks.WorldGen_KillTile_GetItemDrops;
-            On.Terraria.WorldGen.ReplaceTIle_DoActualReplacement += BlockSwapHooks.WorldGen_ReplaceTIle_DoActualReplacement;
-            On.Terraria.Player.PlaceThing_ValidTileForReplacement += BlockSwapHooks.Player_PlaceThing_ValidTileForReplacement;
-            On.Terraria.WorldGen.ReplaceTile += BlockSwapHooks.WorldGen_ReplaceTile;
-            On.Terraria.WorldGen.KillTile_DropItems += BlockSwapHooks.WorldGen_KillTile_DropItems;
+            Terraria.On_WorldGen.WouldTileReplacementWork += BlockSwapHooks.WorldGen_WouldTileReplacementWork;
+            Terraria.On_WorldGen.MoveReplaceTileAnchor += BlockSwapHooks.WorldGen_MoveReplaceTileAnchor;
+            Terraria.On_WorldGen.KillTile_GetItemDrops += BlockSwapHooks.WorldGen_KillTile_GetItemDrops;
+            Terraria.On_WorldGen.ReplaceTIle_DoActualReplacement += BlockSwapHooks.WorldGen_ReplaceTIle_DoActualReplacement;
+            Terraria.On_Player.PlaceThing_ValidTileForReplacement += BlockSwapHooks.Player_PlaceThing_ValidTileForReplacement;
+            Terraria.On_WorldGen.ReplaceTile += BlockSwapHooks.WorldGen_ReplaceTile;
+            Terraria.On_WorldGen.KillTile_DropItems += BlockSwapHooks.WorldGen_KillTile_DropItems;
         }
 
         public override void Unload()
         {
-            On.Terraria.WorldGen.WouldTileReplacementWork -= BlockSwapHooks.WorldGen_WouldTileReplacementWork;
-            On.Terraria.WorldGen.MoveReplaceTileAnchor -= BlockSwapHooks.WorldGen_MoveReplaceTileAnchor;
-            On.Terraria.WorldGen.KillTile_GetItemDrops -= BlockSwapHooks.WorldGen_KillTile_GetItemDrops;
-            On.Terraria.WorldGen.ReplaceTIle_DoActualReplacement -= BlockSwapHooks.WorldGen_ReplaceTIle_DoActualReplacement;
-            On.Terraria.Player.PlaceThing_ValidTileForReplacement -= BlockSwapHooks.Player_PlaceThing_ValidTileForReplacement;
-            On.Terraria.WorldGen.ReplaceTile -= BlockSwapHooks.WorldGen_ReplaceTile;
-            On.Terraria.WorldGen.KillTile_DropItems -= BlockSwapHooks.WorldGen_KillTile_DropItems;
+            Terraria.On_WorldGen.WouldTileReplacementWork -= BlockSwapHooks.WorldGen_WouldTileReplacementWork;
+            Terraria.On_WorldGen.MoveReplaceTileAnchor -= BlockSwapHooks.WorldGen_MoveReplaceTileAnchor;
+            Terraria.On_WorldGen.KillTile_GetItemDrops -= BlockSwapHooks.WorldGen_KillTile_GetItemDrops;
+            Terraria.On_WorldGen.ReplaceTIle_DoActualReplacement -= BlockSwapHooks.WorldGen_ReplaceTIle_DoActualReplacement;
+            Terraria.On_Player.PlaceThing_ValidTileForReplacement -= BlockSwapHooks.Player_PlaceThing_ValidTileForReplacement;
+            Terraria.On_WorldGen.ReplaceTile -= BlockSwapHooks.WorldGen_ReplaceTile;
+            Terraria.On_WorldGen.KillTile_DropItems -= BlockSwapHooks.WorldGen_KillTile_DropItems;
         }
     }
 }

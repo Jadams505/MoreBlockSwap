@@ -242,9 +242,9 @@ namespace MoreBlockSwap
         public static int OpenDoorId(int closedDoor)
         {
             ModTile mClosedDoor = TileLoader.GetTile(closedDoor);
-            if (mClosedDoor != null && mClosedDoor.OpenDoorID > -1)
+            if (mClosedDoor != null && TileID.Sets.OpenDoorID[closedDoor] > -1)
             {
-                return mClosedDoor.OpenDoorID;
+                return TileID.Sets.OpenDoorID[closedDoor];
             }
             
             if(closedDoor == TileID.ClosedDoor)
@@ -258,9 +258,9 @@ namespace MoreBlockSwap
         public static int ClosedDoorId(int openDoor)
         {
             ModTile mOpenDoor = TileLoader.GetTile(openDoor);
-            if (mOpenDoor != null && mOpenDoor.CloseDoorID > -1)
+            if (mOpenDoor != null && TileID.Sets.CloseDoorID[openDoor] > -1)
             {
-                return mOpenDoor.CloseDoorID;
+                return TileID.Sets.CloseDoorID[openDoor];
             }
 
             if(openDoor == TileID.OpenDoor)

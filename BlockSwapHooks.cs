@@ -6,7 +6,7 @@ namespace MoreBlockSwap
 {
     public static class BlockSwapHooks
     {
-        internal static bool WorldGen_ReplaceTile(On.Terraria.WorldGen.orig_ReplaceTile orig, int x, int y, ushort targetType, int targetStyle)
+        internal static bool WorldGen_ReplaceTile(Terraria.On_WorldGen.orig_ReplaceTile orig, int x, int y, ushort targetType, int targetStyle)
         {
             Tile replaceTile = Framing.GetTileSafely(x, y);
             ushort heldTile = targetType;
@@ -26,7 +26,7 @@ namespace MoreBlockSwap
             return orig(x, y, targetType, targetStyle);
         }
 
-        internal static void WorldGen_KillTile_DropItems(On.Terraria.WorldGen.orig_KillTile_DropItems orig, int x, int y, Tile tileCache, bool includeLargeObjectDrops)
+        internal static void WorldGen_KillTile_DropItems(Terraria.On_WorldGen.orig_KillTile_DropItems orig, int x, int y, Tile tileCache, bool includeLargeObjectDrops)
         {
             // Only the case when swapping
             if (includeLargeObjectDrops)
@@ -38,7 +38,7 @@ namespace MoreBlockSwap
         }
 
         // Called only on the client
-        internal static bool Player_PlaceThing_ValidTileForReplacement(On.Terraria.Player.orig_PlaceThing_ValidTileForReplacement orig, Player self)
+        internal static bool Player_PlaceThing_ValidTileForReplacement(Terraria.On_Player.orig_PlaceThing_ValidTileForReplacement orig, Player self)
         {
             bool vanillaCall = orig(self);
             return vanillaCall || IsTileValidForMoreBlockSwapReplacement(self.HeldItem.createTile, self.HeldItem.placeStyle, Player.tileTargetX, Player.tileTargetY);
@@ -47,7 +47,7 @@ namespace MoreBlockSwap
         // Called on the client when used in PlaceThing_ValidTileForReplacement
         // Called on the client and server when used in ReplaceTile
         // In the ReplaceTile case it only gets called on the server if true on the client
-        internal static bool WorldGen_WouldTileReplacementWork(On.Terraria.WorldGen.orig_WouldTileReplacementWork orig, ushort attemptingToReplaceWith, int x, int y)
+        internal static bool WorldGen_WouldTileReplacementWork(Terraria.On_WorldGen.orig_WouldTileReplacementWork orig, ushort attemptingToReplaceWith, int x, int y)
         {
             bool vanillaCall = orig(attemptingToReplaceWith, x, y);
             if (vanillaCall)
@@ -115,7 +115,7 @@ namespace MoreBlockSwap
             return SwapValidityUtil.IsValidForSameTypeReplacement(heldTile, placeStyle, tileToReplace);
         }
 
-        internal static void WorldGen_MoveReplaceTileAnchor(On.Terraria.WorldGen.orig_MoveReplaceTileAnchor orig, ref int x, ref int y, ushort targetType, Tile t)
+        internal static void WorldGen_MoveReplaceTileAnchor(Terraria.On_WorldGen.orig_MoveReplaceTileAnchor orig, ref int x, ref int y, ushort targetType, Tile t)
         {
             if (BlockSwapUtil.ShouldVanillaHandleSwap(targetType, t))
             {
@@ -127,7 +127,7 @@ namespace MoreBlockSwap
             y = topLeftPos.Y;
         }
 
-        internal static void WorldGen_KillTile_GetItemDrops(On.Terraria.WorldGen.orig_KillTile_GetItemDrops orig, int x, int y, Tile tileCache, out int dropItem, out int dropItemStack, out int secondaryItem, out int secondaryItemStack, bool includeLargeObjectDrops)
+        internal static void WorldGen_KillTile_GetItemDrops(Terraria.On_WorldGen.orig_KillTile_GetItemDrops orig, int x, int y, Tile tileCache, out int dropItem, out int dropItemStack, out int secondaryItem, out int secondaryItemStack, bool includeLargeObjectDrops)
         {
             orig(x, y, tileCache, out dropItem, out dropItemStack, out secondaryItem, out secondaryItemStack, includeLargeObjectDrops);
             
@@ -154,7 +154,7 @@ namespace MoreBlockSwap
             }
         }
 
-        internal static void WorldGen_ReplaceTIle_DoActualReplacement(On.Terraria.WorldGen.orig_ReplaceTIle_DoActualReplacement orig, ushort targetType, int targetStyle, int topLeftX, int topLeftY, Tile t)
+        internal static void WorldGen_ReplaceTIle_DoActualReplacement(Terraria.On_WorldGen.orig_ReplaceTIle_DoActualReplacement orig, ushort targetType, int targetStyle, int topLeftX, int topLeftY, Tile t)
         {
             if (BlockSwapUtil.ShouldVanillaHandleSwap(targetType, t))
             {
