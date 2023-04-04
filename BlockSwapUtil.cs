@@ -104,7 +104,6 @@ namespace MoreBlockSwap
                 TileID.Statues => calculatedStyle % 165,
                 TileID.Cannon => Math.Clamp(frameX.SafeDivide(data.CoordinateFullWidth), 0, 3),
                 TileID.SillyBalloonTile => 2 * frameX.SafeDivide(data.CoordinateFullWidth * 2), // Purple = 0, Green = 2, Pink = 4
-                TileID.Campfire => frameX.SafeDivide(data.CoordinateFullWidth), // Remove with 1.4.4
 
                 TileID.GeyserTrap => 0,
                 TileID.BubbleMachine => 0,
@@ -135,7 +134,7 @@ namespace MoreBlockSwap
             return toReplaceData == null || heldTileData == null ||
                 (TileID.Sets.BasicChest[targetType] && TileID.Sets.BasicChest[replaceType]) ||
                 (TileID.Sets.BasicDresser[targetType] && TileID.Sets.BasicDresser[replaceType]) ||
-                /*(targetType == TileID.Campfire && replaceType == TileID.Campfire) ||*/
+                (targetType == TileID.Campfire && replaceType == TileID.Campfire) ||
                 (TileID.Sets.Platforms[targetType] && TileID.Sets.Platforms[replaceType]) ||
                 (TileID.Sets.Torch[targetType] && TileID.Sets.Torch[replaceType]);
         }

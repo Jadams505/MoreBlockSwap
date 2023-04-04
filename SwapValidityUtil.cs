@@ -74,8 +74,8 @@ namespace MoreBlockSwap
             if (heldTile != replaceTile)
             {
                 // Treat planter boxes like platforms
-                if ((heldTile == TileID.PlanterBox && (IsValidForStandardReplacement(replaceTile) || replaceTile == TileID.Platforms)) || 
-                    (replaceTile == TileID.PlanterBox && (IsValidForStandardReplacement(heldTile) || heldTile == TileID.Platforms)))
+                if ((heldTile == TileID.PlanterBox && (IsValidForStandardReplacement(replaceTile) || TileID.Sets.Platforms[replaceTile])) || 
+                    (replaceTile == TileID.PlanterBox && (IsValidForStandardReplacement(heldTile) || TileID.Sets.Platforms[heldTile])))
                 {
                     return true;
                 }
@@ -159,7 +159,6 @@ namespace MoreBlockSwap
                 TileID.Cactus => true, // For some reason cactus is not in Main.tileFrameImportant
                 var type when TileID.Sets.BreakableWhenPlacing[type] || Main.tileCut[type] => true, // These tiles are supposed to break so replacement is effectively already achieved
                 var type when TileID.Sets.DoesntGetReplacedWithTileReplacement[type] => true, // Vanilla prevents against these. Future Consideration: Swapping with magic ice might be useful
-                var type when TileID.Sets.Torch[type] => true, // I am going to forget to remove this in 1.4.4
                 _ => false,
             };
         }
