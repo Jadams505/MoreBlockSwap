@@ -160,12 +160,32 @@ namespace MoreBlockSwap
                 if (TileID.Sets.Conversion.Grass[replaceTile] && TileID.Sets.Conversion.Grass[heldTile])
                 {
                     if ((replaceTile == TileID.GolfGrassHallowed && heldTile == TileID.HallowedGrass) || // can't swap mowed hallow and hallow grass
-                        (replaceTile == TileID.GolfGrass && heldTile == TileID.Grass) || // can't swap mowed and regular grass
-                        (replaceTile == TileID.JungleGrass || heldTile == TileID.JungleGrass)) // can't swap any dirt based grass with jungle grass
+                        (replaceTile == TileID.GolfGrass && heldTile == TileID.Grass)) // can't swap mowed and regular grass
                     {
                         return false;
                     }
                     return true;
+                }
+
+                bool validReplaceMudConversion = TileID.Sets.Conversion.JungleGrass[replaceTile] || TileID.Sets.Conversion.MushroomGrass[replaceTile];
+
+                if (validReplaceMudConversion)
+                {
+                    // corrupt seeds have the placeTile of Corrupt Grass (23) but also place Corrupt Jungle Grass (661)
+                    if(heldTile == TileID.CorruptGrass && replaceTile != TileID.CorruptJungleGrass)
+                    {
+                        swapTileId = TileID.CorruptJungleGrass;
+                        return true;
+                    }
+
+                    // crimson seeds have the placeTile of Crimson Grass (199) but also place Crimson Jungle Grass (662)
+                    if (heldTile == TileID.CrimsonGrass && replaceTile != TileID.CrimsonJungleGrass)
+                    {
+                        swapTileId = TileID.CrimsonJungleGrass;
+                        return true;
+                    }
+
+                    return TileID.Sets.Conversion.JungleGrass[heldTile] || TileID.Sets.Conversion.MushroomGrass[heldTile];
                 }
 
                 if ((replaceTile == TileID.JungleGrass && heldTile == TileID.MushroomGrass) ||
