@@ -19,7 +19,7 @@ namespace MoreBlockSwap
             var args = new object[] { x, y, tileCache, 0, 0, 0, 0, includeLargeObjectDrops };
             
             WorldGen_KillTile_GetItemDrops.Invoke(null, args);
-            
+
             int dropItem = (int)args[3];
             int dropItemStack = (int)args[4];
             int secondaryItem = (int)args[5];
@@ -67,10 +67,11 @@ namespace MoreBlockSwap
             }
 
             ModTile mTile = TileLoader.GetTile(targetTileId);
+            int drop = TileLoader.GetItemDropFromTypeAndStyle(targetTileId);
 
-            if(mTile != null && mTile.ItemDrop > 0)
+            if(mTile != null && drop > 0)
             {
-                return mTile.ItemDrop;
+                return drop;
             }
 
             for (int i = 0; i < ItemID.Count; ++i)
