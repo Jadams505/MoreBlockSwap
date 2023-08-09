@@ -1,4 +1,2 @@
 ﻿
-Fixed issues with swapping closed and open doors
-Torches can no longer be swapped with each other. Fixing torch duplication
-Fixed an issue where tiles that had alternate placements would fail to swap
+Updated to 1.4.4

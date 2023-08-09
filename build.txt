@@ -1,4 +1,4 @@
 displayName = More Block Swap
 author = Jadams
-version = 1.0.1.0
+version = 1.1.0.0
 homepage = https://github.com/Jadams505/MoreBlockSwap
