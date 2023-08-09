@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Reflection;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -58,7 +59,7 @@ namespace MoreBlockSwap
             }
         }
 
-        public static int GetItemDrop(int targetTileId, int targetStyle)
+        public static int GetItemDrop(int targetTileId, int targetStyle, int x, int y)
         {
             int customDrop = GetCustomDrop(targetTileId, targetStyle);
             if (customDrop != -1)
@@ -67,11 +68,13 @@ namespace MoreBlockSwap
             }
 
             ModTile mTile = TileLoader.GetTile(targetTileId);
-            int drop = TileLoader.GetItemDropFromTypeAndStyle(targetTileId);
-
-            if(mTile != null && drop > 0)
+            if(mTile is not null)
             {
-                return drop;
+                var items = mTile.GetItemDrops(x, y);
+                Item? modDrop = items?.FirstOrDefault();
+
+                if (modDrop is not null)
+                    return modDrop.type;
             }
 
             for (int i = 0; i < ItemID.Count; ++i)

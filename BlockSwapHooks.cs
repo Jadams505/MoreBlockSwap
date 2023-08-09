@@ -151,7 +151,7 @@ namespace MoreBlockSwap
                 }
 
                 int style = BlockSwapUtil.GetItemPlaceStyleFromTile(tileCache);
-                int drop = ItemDropUtil.GetItemDrop(targetTileId, style);
+                int drop = ItemDropUtil.GetItemDrop(targetTileId, style, x, y);
                 if (drop != -1)
                 {
                     dropItem = drop;
