@@ -2,6 +2,7 @@
 using System;
 using Terraria;
 using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
@@ -124,6 +125,26 @@ namespace MoreBlockSwap
 
                 _ => -1
             };
+        }
+
+        public static bool IsRubblemakerTile(int heldTile) => heldTile == TileID.LargePilesEcho || heldTile == TileID.LargePiles2Echo ||
+                heldTile == TileID.PlantDetritus2x2Echo || heldTile == TileID.PlantDetritus3x2Echo ||
+                heldTile == TileID.SmallPiles1x1Echo || heldTile == TileID.SmallPiles2x1Echo;
+
+        public static bool GetPlaceStyleForRubblemaker(Player player, out int placeStyle)
+        {
+            Item heldItem = player.HeldItem;
+            FlexibleTileWand wandData = heldItem.GetFlexibleTileWand();
+
+            if(wandData?.TryGetPlacementOption(player, Player.FlexibleWandRandomSeed, Player.FlexibleWandCycleOffset, 
+                out FlexibleTileWand.PlacementOption option, out _) is true)
+            {
+                placeStyle = option.TileStyleToPlace;
+                return true;
+            }
+            
+            placeStyle = 0;
+            return false;
         }
 
         public static bool ShouldVanillaHandleSwap(int targetType, Tile tileToReplace)

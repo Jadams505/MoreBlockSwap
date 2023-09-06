@@ -1,9 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ObjectData;
 
 namespace MoreBlockSwap
 {
@@ -104,6 +106,10 @@ namespace MoreBlockSwap
 
         public static int GetCustomDrop(int targetTileId, int targetStyle)
         {
+            if (GetDropForRubblemaker(targetTileId, targetStyle, out int rubbleDrop))
+            {
+                return rubbleDrop;
+            }
             return targetTileId switch
             {
                 TileID.Sandcastles => ItemID.SandBlock,
@@ -111,6 +117,53 @@ namespace MoreBlockSwap
                 TileID.TallGateOpen => ItemID.TallGate,
                 _ => -1,
             };
+        }
+
+        public static bool GetDropForRubblemaker(int targetTile, int targetStyle, out int drop)
+        {
+            if (GetDropFromFlexibleTileWand(FlexibleTileWand.RubblePlacementSmall, targetTile, targetStyle, out drop))
+                return true;
+
+            if (GetDropFromFlexibleTileWand(FlexibleTileWand.RubblePlacementMedium, targetTile, targetStyle, out drop))
+                return true;
+
+            if (GetDropFromFlexibleTileWand(FlexibleTileWand.RubblePlacementLarge, targetTile, targetStyle, out drop))
+                return true;
+
+            return false;
+        }
+
+        internal static FieldInfo FlexibleTileWand_options;
+        internal static FieldInfo OptionBucket_ItemTypeToConsume;
+        internal static FieldInfo OptionBucket_Options;
+
+        private static bool GetDropFromFlexibleTileWand(FlexibleTileWand wandData, int targetTile, int targetStyle, out int drop)
+        {
+            drop = -1;
+            FlexibleTileWand_options ??= typeof(FlexibleTileWand)?.GetField("_options", BindingFlags.NonPublic | BindingFlags.Instance);
+
+            // Dictionary<int, FlexibleTileWand.OptionBucket>
+            IDictionary dictionary = (IDictionary)FlexibleTileWand_options.GetValue(wandData);
+
+            // typeof(object) is FlexibleTileWand.OptionBucket, but its private :(
+            foreach (object entry in dictionary.Values)
+            {
+                OptionBucket_ItemTypeToConsume ??= entry?.GetType()?.GetField("ItemTypeToConsume", BindingFlags.Instance | BindingFlags.Public);
+                OptionBucket_Options ??= entry?.GetType()?.GetField("Options", BindingFlags.Instance | BindingFlags.Public);
+
+                int itemId = (int)OptionBucket_ItemTypeToConsume.GetValue(entry);
+                List<FlexibleTileWand.PlacementOption> options = (List<FlexibleTileWand.PlacementOption>)OptionBucket_Options?.GetValue(entry);
+
+                FlexibleTileWand.PlacementOption target = options?.FirstOrDefault(option => option.TileIdToPlace == targetTile && option.TileStyleToPlace == targetStyle, null);
+
+                if (target is not null)
+                {
+                    drop = itemId;
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

@@ -41,7 +41,7 @@ namespace MoreBlockSwap
         internal static bool Player_PlaceThing_ValidTileForReplacement(Terraria.On_Player.orig_PlaceThing_ValidTileForReplacement orig, Player self)
         {
             bool vanillaCall = orig(self);
-            return vanillaCall || IsTileValidForMoreBlockSwapReplacement(self.HeldItem.createTile, self.HeldItem.placeStyle, Player.tileTargetX, Player.tileTargetY);
+            return vanillaCall || IsTileValidForMoreBlockSwapReplacement(self, self.HeldItem.createTile, self.HeldItem.placeStyle, Player.tileTargetX, Player.tileTargetY);
         }
 
         // Called on the client when used in PlaceThing_ValidTileForReplacement
@@ -64,13 +64,16 @@ namespace MoreBlockSwap
             }
 
             // Check made by the client so Main.LocalPlayer can be used
-            return IsTileValidForMoreBlockSwapReplacement(attemptingToReplaceWith, Main.LocalPlayer.HeldItem.placeStyle, x, y);
+            return IsTileValidForMoreBlockSwapReplacement(Main.LocalPlayer, attemptingToReplaceWith, Main.LocalPlayer.HeldItem.placeStyle, x, y);
         }
 
-        private static bool IsTileValidForMoreBlockSwapReplacement(int heldTile, int placeStyle, int targetX, int targetY)
+        private static bool IsTileValidForMoreBlockSwapReplacement(Player player, int heldTile, int placeStyle, int targetX, int targetY)
         {
             Tile tileToReplace = Main.tile[targetX, targetY];
             TileObjectData data = TileObjectData.GetTileData(tileToReplace);
+
+            if (BlockSwapUtil.GetPlaceStyleForRubblemaker(player, out int rubblePlaceStyle))
+                placeStyle = rubblePlaceStyle;
 
             if (!tileToReplace.HasTile)
             {
