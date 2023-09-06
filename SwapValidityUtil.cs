@@ -32,12 +32,12 @@ namespace MoreBlockSwap
             if (BlockSwapUtil.IsOpenDoor(openDoor.TileType) && BlockSwapUtil.IsClosedDoor(closedDoor))
             {
                 int replacementOpenDoorId = BlockSwapUtil.OpenDoorId(closedDoor);
-                TileObjectData replacemenOpenDoortData = TileObjectData.GetTileData(replacementOpenDoorId, 0);
+                TileObjectData replacemenOpenDoorData = TileObjectData.GetTileData(replacementOpenDoorId, 0);
                 TileObjectData currentOpenDoorData = TileObjectData.GetTileData(openDoor);
 
-                if (replacemenOpenDoortData == null || currentOpenDoorData == null ||
-                    replacemenOpenDoortData.Width != currentOpenDoorData.Width ||
-                    replacemenOpenDoortData.Height != currentOpenDoorData.Height)
+                if (replacemenOpenDoorData == null || currentOpenDoorData == null ||
+                    replacemenOpenDoorData.Width != currentOpenDoorData.Width ||
+                    replacemenOpenDoorData.Height != currentOpenDoorData.Height)
                 {
                     return false;
                 }
