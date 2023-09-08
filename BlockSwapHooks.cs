@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
+using MonoMod.Cil;
 using Terraria;
+using Terraria.ModLoader;
 using Terraria.ObjectData;
 
 namespace MoreBlockSwap
@@ -19,7 +21,7 @@ namespace MoreBlockSwap
 
             if (SwapValidityUtil.IsValidFramedTileCase(heldTile, targetType, replaceTile))
             {
-                ReplacementUtil.ReplaceSingleTile( x, y, targetType, targetStyle);
+                ReplacementUtil.ReplaceSingleTile(x, y, targetType, targetStyle);
                 return true;
             }
 
@@ -72,8 +74,11 @@ namespace MoreBlockSwap
             Tile tileToReplace = Main.tile[targetX, targetY];
             TileObjectData data = TileObjectData.GetTileData(tileToReplace);
 
-            if (BlockSwapUtil.GetPlaceStyleForRubblemaker(player, out int rubblePlaceStyle))
+            if (BlockSwapUtil.GetPlaceDataForRubblemaker(player, out int rubblePlaceTile, out int rubblePlaceStyle))
+            {
+                heldTile = rubblePlaceTile;
                 placeStyle = rubblePlaceStyle;
+            }
 
             if (!tileToReplace.HasTile)
             {
@@ -180,6 +185,60 @@ namespace MoreBlockSwap
             }
 
             ReplacementUtil.MultiTileSwap(targetType, targetStyle, topLeftX, topLeftY);
+
+            // Manually consume the rubblemaker item because replacement ignores the usual use item code
+            if (!Main.dedServ)
+            {
+                if (BlockSwapUtil.IsRubblemakerTile(targetType))
+                    Main.LocalPlayer.PlaceThing_Tiles_PlaceIt_ConsumeFlexibleWandMaterial();
+            }
+        }
+
+        internal static void IL_Player_PlaceThing_TryReplacingTiles(MonoMod.Cil.ILContext il)
+        {
+            var c = new ILCursor(il);
+
+            if (!c.TryGotoNext(MoveType.After, i => i.MatchCall(typeof(Player), "PlaceThing_Tiles_GetAutoAccessoryCache")))
+            {
+                MoreBlockSwap.Instance.Logger.Info("Failed to Find IL for PlaceThing_Tiles_GetAutoAccessoryCache");
+                return;
+            }
+
+            if(!c.TryGotoNext(MoveType.After, i => i.MatchLdfld(typeof(Item), "createTile")))
+            {
+                MoreBlockSwap.Instance.Logger.Info("Failed to Find IL for createTile");
+                return;
+            }
+
+            // ldfld System.Int32 Terraria.Item::createTile
+            c.EmitDelegate(CustomPlaceTile);
+            // stloc.s V_7
+
+            if (!c.TryGotoNext(MoveType.After, i => i.MatchLdfld(typeof(Item), "placeStyle")))
+            {
+                MoreBlockSwap.Instance.Logger.Info("Failed to Find IL for placeStyle");
+                return;
+            }
+
+            // ldfld System.Int32 Terraria.Item::placeStyle
+            c.EmitDelegate(CustomPlaceStyle);
+            // stloc.s V_8
+        }
+
+        private static int CustomPlaceStyle(int placeStyle)
+        {
+            if (BlockSwapUtil.GetPlaceDataForRubblemaker(Main.LocalPlayer, out _, out int rubblePlaceStyle))
+                placeStyle = rubblePlaceStyle;
+
+            return placeStyle;
+        }
+
+        private static int CustomPlaceTile(int placeTile)
+        {
+            if (BlockSwapUtil.GetPlaceDataForRubblemaker(Main.LocalPlayer, out int rubblePlaceTile, out _))
+                placeTile = rubblePlaceTile;
+
+            return placeTile;
         }
     }
 }

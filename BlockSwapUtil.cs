@@ -131,7 +131,7 @@ namespace MoreBlockSwap
                 heldTile == TileID.PlantDetritus2x2Echo || heldTile == TileID.PlantDetritus3x2Echo ||
                 heldTile == TileID.SmallPiles1x1Echo || heldTile == TileID.SmallPiles2x1Echo;
 
-        public static bool GetPlaceStyleForRubblemaker(Player player, out int placeStyle)
+        public static bool GetPlaceDataForRubblemaker(Player player, out int placeTile, out int placeStyle)
         {
             Item heldItem = player.HeldItem;
             FlexibleTileWand wandData = heldItem.GetFlexibleTileWand();
@@ -139,11 +139,12 @@ namespace MoreBlockSwap
             if(wandData?.TryGetPlacementOption(player, Player.FlexibleWandRandomSeed, Player.FlexibleWandCycleOffset, 
                 out FlexibleTileWand.PlacementOption option, out _) is true)
             {
+                placeTile = option.TileIdToPlace;
                 placeStyle = option.TileStyleToPlace;
                 return true;
             }
-            
-            placeStyle = 0;
+            placeTile = heldItem.createTile;
+            placeStyle = heldItem.placeStyle;
             return false;
         }
 

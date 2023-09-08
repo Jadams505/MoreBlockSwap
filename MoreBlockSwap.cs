@@ -15,6 +15,7 @@ namespace MoreBlockSwap
             Terraria.On_Player.PlaceThing_ValidTileForReplacement += BlockSwapHooks.Player_PlaceThing_ValidTileForReplacement;
             Terraria.On_WorldGen.ReplaceTile += BlockSwapHooks.WorldGen_ReplaceTile;
             Terraria.On_WorldGen.KillTile_DropItems += BlockSwapHooks.WorldGen_KillTile_DropItems;
+            Terraria.IL_Player.PlaceThing_TryReplacingTiles += BlockSwapHooks.IL_Player_PlaceThing_TryReplacingTiles;
         }
 
         public override void Unload()
@@ -26,6 +27,7 @@ namespace MoreBlockSwap
             Terraria.On_Player.PlaceThing_ValidTileForReplacement -= BlockSwapHooks.Player_PlaceThing_ValidTileForReplacement;
             Terraria.On_WorldGen.ReplaceTile -= BlockSwapHooks.WorldGen_ReplaceTile;
             Terraria.On_WorldGen.KillTile_DropItems -= BlockSwapHooks.WorldGen_KillTile_DropItems;
+            Terraria.IL_Player.PlaceThing_ValidTileForReplacement -= BlockSwapHooks.IL_Player_PlaceThing_TryReplacingTiles;
         }
     }
 }
